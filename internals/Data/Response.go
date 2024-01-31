@@ -26,6 +26,8 @@ func GetErrorByResult(res_code int) (string, int, string) {
 		return "Your Message has a bad word", http.StatusNotAcceptable, "FAILD" // response Status Error - Bad Word
 	case 15:
 		return "Your Messages Length is more than 30 character", http.StatusBadRequest, "FAILD" // response Status Error - message length
+	case 16:
+		return "There is a problem in the system", http.StatusServiceUnavailable, "FAILD" // response Status Error - Server has problem (bug)
 	default:
 		return "There is a problem", http.StatusNotAcceptable, "FAILD" // Response Status Error - uknown Eror
 	}

@@ -19,5 +19,6 @@ func main() {
 	}
 	Handlers.Handler(e)
 	DB.PrepairDBSystem()
+
 	e.Logger.Fatal(e.Start(":3000"))
 }
