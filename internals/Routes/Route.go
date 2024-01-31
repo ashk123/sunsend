@@ -5,8 +5,8 @@ import (
 )
 
 type Route struct {
-	Path   string
-	Runner echo.HandlerFunc
+	Path   string           // Route Path
+	Runner echo.HandlerFunc // Route Action Function
 }
 
 func NewRoute(user_path string, user_runner echo.HandlerFunc) *Route {

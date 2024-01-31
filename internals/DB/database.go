@@ -3,7 +3,6 @@ package DB
 import (
 	"database/sql"
 	"log"
-	"math/rand"
 	"os"
 
 	_ "modernc.org/sqlite" // sqlite without cgo
@@ -32,7 +31,7 @@ func PrepairDBSystem() {
 		createDataBase()
 		// CreateMessageTable()
 		createBaseTable()
-		InsertChannel(rand.Intn(999), "Channel_1", "this is the default channel", "Eiko") // Create default chat Channel
+		InsertChannel(123, "Channel_1", "this is the default channel", "Eiko") // Create default chat Channel
 	} else {
 		// db = getbasedb()
 		log.Println("\nThere is a database.")
