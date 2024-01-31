@@ -9,8 +9,8 @@ Welcome to the world of Message Boards :-)
 
 There is 2 program for using sunsend:
 
-1. Server Side Program (backend): A program that can provide the chat system
-2. Client Side program (frontend): A program that can provide a interface for using server side program
+1. Server Side Program (backend): A program that can provide the chat system written in go (in progress)
+2. Client Side program (frontend): A program that can provide a interface for using server side program written in JS (soon)
 
 For sending messages, you need to specify the special channel, each channel has some ID that you can find in the API documentation (in progress)
 
