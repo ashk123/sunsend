@@ -42,7 +42,7 @@ func GetChatPostAction(c echo.Context) error {
 
 }
 
-func StreamResponseJSON(c echo.Context, chat_data []*Base.ChatCollection) error {
+func StreamResponseJSON(c echo.Context, chat_data []*Data.Chat) error {
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
 	c.Response().WriteHeader(http.StatusOK)
 	return json.NewEncoder(c.Response()).Encode(chat_data)
@@ -54,7 +54,7 @@ func chatActionFunc(c echo.Context) error {
 	// Handle the Chat Channel with c.Param("id")
 	channel_id := c.Param("id")
 	var response *Data.Response
-	res := Base.ChannelExists(channel_id)
+	res := Base.ChannelExists(channel_id) // if channel exists
 
 	if res != 0 {
 		response, _ = Data.NewResponse(c, res, channel_id, nil)

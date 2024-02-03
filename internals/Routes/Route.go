@@ -16,6 +16,7 @@ func NewRoute(user_path string, user_runner echo.HandlerFunc) *Route {
 	}
 }
 
-func (m *Route) getRunner() echo.HandlerFunc {
-	return m.Runner
-}
+// unused function (maybe later)
+// func (m *Route) getRunner() echo.HandlerFunc {
+// 	return m.Runner
+// }

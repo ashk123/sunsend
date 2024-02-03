@@ -8,12 +8,12 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-type Channel struct {
-	ID          int
-	Name        string
-	Description string
-	Owner       string
-}
+// type Channel struct {
+// 	ID          int
+// 	Name        string
+// 	Description string
+// 	Owner       string
+// }
 
 func createBaseTable() int {
 	db_work := getbasedb()
@@ -54,10 +54,9 @@ func createBaseTable() int {
 	log.Println("Base Messages table created")
 	return 0
 }
-
-func QueryChannel() (*sql.Rows, int) {
+func QueryRows(query string) (*sql.Rows, int) {
 	db := getbasedb()
-	row, err := db.Query("SELECT * FROM Channels")
+	row, err := db.Query(query)
 	if err != nil {
 		// log.Fatal(err)
 		return nil, 16
@@ -66,11 +65,10 @@ func QueryChannel() (*sql.Rows, int) {
 	// defer row.Close()
 	return row, 0
 }
-
-func QueryMessages() (*sql.Rows, int) {
+func QueryRow(query string) (*sql.Row, int) {
 	db := getbasedb()
-	row, err := db.Query("SELECT * FROM Messages")
-	if err != nil {
+	row := db.QueryRow(query)
+	if row == nil {
 		// log.Fatal(err)
 		return nil, 16
 	}
@@ -78,6 +76,30 @@ func QueryMessages() (*sql.Rows, int) {
 	// defer row.Close()
 	return row, 0
 }
+
+// func QueryChannel() (*sql.Rows, int) {
+// 	db := getbasedb()
+// 	row, err := db.Query("SELECT * FROM Channels")
+// 	if err != nil {
+// 		// log.Fatal(err)
+// 		return nil, 16
+// 	}
+// 	defer db.Close()
+// 	// defer row.Close()
+// 	return row, 0
+// }
+
+// func QueryMessages(query string) (*sql.Rows, int) {
+// 	db := getbasedb()
+// 	row, err := db.Query("SELECT * FROM Messages")
+// 	if err != nil {
+// 		// log.Fatal(err)
+// 		return nil, 16
+// 	}
+// 	defer db.Close()
+// 	// defer row.Close()
+// 	return row, 0
+// }
 
 func InsertChannel(user_ID int, user_Name string, user_Descriptin string, user_Owner string) int {
 	db := getbasedb()

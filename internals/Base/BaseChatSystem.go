@@ -4,25 +4,32 @@ import (
 	"fmt"
 	"log"
 	"sunsend/internals/DB"
+	"sunsend/internals/Data"
 )
 
 // There should be a ChannelCollection too
 // that Holds the Channel structure
 // Like ChatColelction
+// type ChannelCollection struct {
+// 	Id          int
+// 	Name        string
+// 	Description string
+// 	Owner       string
+// }
 
-// Base Chat Structure
-type ChatCollection struct {
-	CID     int
-	MID     int
-	Author  string
-	Content string
-	Date    string
-	ReplyID int
-}
+// // Base Chat Structure
+// type Data.Chat struct {
+// 	CID     int
+// 	MID     int
+// 	Author  string
+// 	Content string
+// 	Date    string
+// 	ReplyID int
+// }
 
-func FindMsgsByChannelID(ID string) ([]*ChatCollection, int) {
-	data := []*ChatCollection{}
-	channel_rows, res := DB.QueryMessages()
+func FindMsgsByChannelID(ID string) ([]*Data.Chat, int) {
+	data := []*Data.Chat{}
+	channel_rows, res := DB.QueryRows("SELECT * FROM Messages")
 	if res != 0 {
 		return nil, res
 	}
@@ -40,7 +47,7 @@ func FindMsgsByChannelID(ID string) ([]*ChatCollection, int) {
 			log.Fatal(err.Error())
 		}
 		if fmt.Sprintf("%d", user_CID) == ID {
-			Chat := &ChatCollection{
+			Chat := &Data.Chat{
 				CID:     user_CID,
 				MID:     user_MID,
 				Author:  user_Author,
@@ -55,7 +62,7 @@ func FindMsgsByChannelID(ID string) ([]*ChatCollection, int) {
 }
 
 func ChannelExists(channel string) int {
-	channel_rows, res := DB.QueryChannel()
+	channel_rows, res := DB.QueryRows("SELECT * FROM Channels")
 	if res != 0 {
 		// fmt.Println("there is a bug here")
 		return res

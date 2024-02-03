@@ -1,10 +1,7 @@
 package Base
 
 func IsEqulTo(message string) bool {
-	if message == "321" {
-		return true
-	}
-	return false
+	return message == "321"
 }
 
 func CheckMessage(message string) int {
