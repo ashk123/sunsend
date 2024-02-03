@@ -26,8 +26,8 @@ func GetChatPostAction(c echo.Context) error {
 	}
 	res_exists_channel := Base.ChannelExists(channel_id_user)
 	if res_exists_channel != 0 {
-		response, _ := Data.NewResponse(c, res_exists_channel, channel_id_user, nil)
-		return c.JSON(http.StatusBadRequest, response) // should be same Statuscode as NewResponse
+		response_org, _ := Data.NewResponse(c, res_exists_channel, channel_id_user, nil)
+		return c.JSON(http.StatusBadRequest, response_org) // should be same Statuscode as NewResponse
 	}
 
 	// fmt.Println(msg)
@@ -54,14 +54,14 @@ func chatActionFunc(c echo.Context) error {
 	// Handle the Chat Channel with c.Param("id")
 	channel_id := c.Param("id")
 	var response *Data.Response
-	res := Base.ChannelExists(channel_id) // if channel exists
+	res_exists_channel := Base.ChannelExists(channel_id) // if channel exists
 
-	if res != 0 {
-		response, _ = Data.NewResponse(c, res, channel_id, nil)
-		_, error_code_org, _ := Data.GetErrorByResult(res)
+	if res_exists_channel != 0 {
+		response, _ = Data.NewResponse(c, res_exists_channel, channel_id, nil)
+		_, error_code_org, _ := Data.GetErrorByResult(res_exists_channel)
 		return c.JSON(error_code_org, response)
 	}
-
+	fmt.Println(res_exists_channel)
 	chat_collection, res := Base.FindMsgsByChannelID(channel_id)
 	if res != 0 {
 		response, _ = Data.NewResponse(c, 11, channel_id, nil)

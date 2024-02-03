@@ -57,24 +57,26 @@ func createBaseTable() int {
 func QueryRows(query string) (*sql.Rows, int) {
 	db := getbasedb()
 	row, err := db.Query(query)
+	defer db.Close()
 	if err != nil {
 		// log.Fatal(err)
 		return nil, 16
 	}
-	defer db.Close()
+
 	// defer row.Close()
 	return row, 0
 }
-func QueryRow(query string) (*sql.Row, int) {
+func QueryRow(query string) *sql.Row {
 	db := getbasedb()
 	row := db.QueryRow(query)
-	if row == nil {
-		// log.Fatal(err)
-		return nil, 16
-	}
 	defer db.Close()
+	// if row == nil {
+	// 	// log.Fatal(err)
+	// 	return nil, 16
+	// }
+
 	// defer row.Close()
-	return row, 0
+	return row
 }
 
 // func QueryChannel() (*sql.Rows, int) {
@@ -110,13 +112,13 @@ func InsertChannel(user_ID int, user_Name string, user_Descriptin string, user_O
 	// This is good to avoid SQL injections
 	if err != nil {
 		// log.Fatalln(err.Error())
-		log.Println(err.Error())
+		fmt.Println(err.Error())
 		return 16
 	}
 	_, err = statement.Exec(user_ID, user_Name, user_Descriptin, user_Owner)
 	if err != nil {
 		// log.Fatalln(err.Error())
-		log.Println(err.Error())
+		fmt.Println(err.Error())
 		return 16
 	}
 	log.Println("Channel", user_Name, "Created SuccsessFuly.")
@@ -131,12 +133,15 @@ func InsertMsg(CID int, MID int, Author string, Content string, Date string, Rep
 	// This is good to avoid SQL injections
 	if err != nil {
 		// log.Fatalln(err.Error())
+		fmt.Println("1", err.Error())
 		return 16
 	}
 
 	_, err = statement.Exec(CID, MID, Author, Content, Date, ReplyID)
 	if err != nil {
 		// log.Fatalln(err.Error())
+		fmt.Println("1", err.Error())
+
 		return 16
 	}
 	log.Println("User", Author, "Sent Message to channel", CID)
