@@ -29,7 +29,6 @@ func createDataBase() {
 func PrepairDBSystem() {
 	if _, err := os.Stat("Storage/SunSend.db"); os.IsNotExist(err) {
 		createDataBase()
-		// CreateMessageTable()
 		createBaseTable()
 		InsertChannel(123, "Channel_1", "this is the default channel", "Eiko") // Create default chat Channel
 	} else {
