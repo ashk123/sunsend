@@ -1,13 +1,24 @@
 package CoreConfig
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"log"
 	"os"
 	"sunsend/internals/Data"
+	"time"
 
 	"github.com/joho/godotenv"
 )
+
+type UserConfigStr struct {
+	ServerName        string `json:Server_Name`
+	ServerDescription string `json:Server_Description`
+	ServerOwner       string `json:Server_Owner`
+	ServerDateFormat  string `json:Server_Date_Format`
+}
 
 var Configs *Data.Config
 var rawapikey string
@@ -27,21 +38,52 @@ func getEnvConfig() (map[string]string, error) {
 	return ret_values, nil
 }
 
+func getUserConfig() map[string]interface{} {
+	file, err := os.Open("Config/config.json")
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	defer file.Close()
+
+	// sample_config_str := &UserConfigStr{}
+	var sample_config_str map[string]interface{}
+	read, err := io.ReadAll(file)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	json.Unmarshal(read, &sample_config_str)
+
+	return sample_config_str
+}
+
+func ShowConfigInformation() {
+	fmt.Println("=========================")
+	fmt.Println("Server Config Information")
+	fmt.Println("Server Name:", Configs.Server.Name)
+	fmt.Println("Server Description:", Configs.Server.Description)
+	fmt.Println("Server Owner:", Configs.Server.Owner)
+	fmt.Println("Server Date:", Configs.Server.Date)
+	fmt.Println("=========================")
+}
+
 func UpdateConfigs() {
 	envconfigs, err := getEnvConfig()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	// TODO: get the user configs here
-
+	userConfig := getUserConfig()
+	fmt.Println(userConfig)
 	Configs = &Data.Config{
 		Dotenv:  envconfigs,
 		Uconfig: nil, // for now just a little cute nil ^^
 		Server: &Data.Server{ // TODO: will holds data from user config file
-			Name:        "test",
-			Description: "test1",
-			Owner:       "test",
-			Date:        "test",
+			Name:        userConfig["Server_Name"].(string),
+			Description: userConfig["Server_Description"].(string),
+			Owner:       userConfig["Server_Owner"].(string),
+			Date:        time.Now().String(), // TODO: Check which type of date format user wants
 			Key:         rawapikey,
 		},
 	}

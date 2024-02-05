@@ -15,4 +15,5 @@ func GenerateAPIKey() [32]byte {
 func main() {
 	res := GenerateAPIKey()
 	fmt.Println("Your API KEY is: ", fmt.Sprintf("%X", res))
+	// TODO: Add new key to the .env file
 }

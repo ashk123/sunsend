@@ -17,8 +17,21 @@ import (
 func GetChatPostAction(c echo.Context) error {
 	channel_id_user := c.Param("id")
 	user := c.FormValue("user")
-	msg := c.FormValue("message") // get the message from user
+	msg := c.FormValue("message") // get the message from userres_api_key
 	fmt.Println("user", user, "wants to send a message to channel", channel_id_user, ":", msg)
+	headers := c.Request().Header
+	apiKey, res_api_key := Base.BearerToken(headers)
+	if res_api_key != 0 {
+		response, _ := Data.NewResponse(c, res_api_key, channel_id_user, nil)
+		_, error_code_org, _ := Data.GetErrorByResult(res_api_key)
+		return c.JSON(error_code_org, response)
+	}
+	res_check_api := Base.ApiKeyIsValid(apiKey)
+	if res_check_api != 0 {
+		response2, _ := Data.NewResponse(c, res_check_api, channel_id_user, nil)
+		_, error_code_org2, _ := Data.GetErrorByResult(res_check_api)
+		return c.JSON(error_code_org2, response2)
+	}
 	err := Base.CheckMessage(msg)
 	if err != 0 {
 		response, _ := Data.NewResponse(c, err, channel_id_user, nil)
@@ -76,7 +89,7 @@ func chatActionFunc(c echo.Context) error {
 	fmt.Println(len(chat_collection))
 	headers := c.Request().Header
 	apiKey, res_api_key := Base.BearerToken(headers)
-	if res != 0 {
+	if res_api_key != 0 {
 		response, _ = Data.NewResponse(c, res_api_key, channel_id, nil)
 		_, error_code_org, _ := Data.GetErrorByResult(res_api_key)
 		return c.JSON(error_code_org, response)

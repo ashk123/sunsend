@@ -1,10 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"sunsend/internals/CoreConfig"
 	"sunsend/internals/DB"
+	"sunsend/internals/Data"
 	"sunsend/internals/Handlers"
 	"sunsend/internals/Renderer"
 	"text/template"
@@ -15,7 +14,9 @@ import (
 func main() {
 	e := echo.New()
 	CoreConfig.UpdateConfigs() // load bouth .env configs and user configs
-	log.Println("Your API Key is: " + fmt.Sprintf("%s", CoreConfig.Configs.Server.Key))
+	Data.LoadWordsFromConfig() // It loads here just for test
+	CoreConfig.ShowConfigInformation()
+	// log.Println("Your API Key is: " + fmt.Sprintf("%s", CoreConfig.Configs.Server.Key))
 	// e.Use(middleware.Logger())
 	// e.Use(middleware.Recover())
 	e.Renderer = &Renderer.Template{
