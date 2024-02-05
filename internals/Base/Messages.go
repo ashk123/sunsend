@@ -3,19 +3,25 @@ package Base
 import (
 	"fmt"
 	"log"
+	"strings"
 	"sunsend/internals/DB"
 	"sunsend/internals/Data"
 )
 
 func IsEqulTo(message string) bool {
-	return message == "321"
+	for _, v := range *Data.LoadedWordList {
+		if message == v || strings.Contains(message, v) {
+			return true
+		}
+	}
+	return false
 }
 
 func CheckMessage(message string) int {
 	if len(message) > 30 {
-		return 15
+		return 15 //  response 15 -> length error
 	} else if IsEqulTo(message) {
-		return 12
+		return 12 // response 12 -> Word error
 	}
 	return 0
 }

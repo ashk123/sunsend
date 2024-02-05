@@ -28,6 +28,8 @@ func GetErrorByResult(res_code int) (string, int, string) {
 		return "Your Messages Length is more than 30 character", http.StatusBadRequest, "FAILD" // response Status Error - message length
 	case 16:
 		return "There is a problem in the system", http.StatusServiceUnavailable, "FAILD" // response Status Error - Server has problem (bug)
+	case 17:
+		return "Invalid API KEY", http.StatusBadRequest, "FAILD" // response Status Error - invalid api key
 	default:
 		return "There is a problem", http.StatusNotAcceptable, "FAILD" // Response Status Error - uknown Eror
 	}

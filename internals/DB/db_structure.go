@@ -19,7 +19,7 @@ func createBaseTable() int {
 	db_work := getbasedb()
 
 	base_channels_table := `CREATE TABLE Channels (
-		"ID" integer NOT NULL PRIMARY KEY,		
+		"ID" integer NOT NULL PRIMARY KEY,
 		"Name" TEXT,
 		"Description" TEXT,
 		"Owner" TEXT
@@ -31,7 +31,12 @@ func createBaseTable() int {
 		fmt.Println("this is where I stoped the program hahahahaha")
 		log.Fatalln(err.Error())
 	}
-	statement_channel.Exec() // Execute SQL Statements
+	res, err := statement_channel.Exec() // Execute SQL Statements
+	if err != nil {
+		// fmt.Println(err.Error(), res)
+		log.Fatal(err.Error(), res)
+	}
+
 	log.Println("Base Channels table created")
 	// CreateMessageTable()
 

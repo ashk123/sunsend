@@ -22,12 +22,14 @@ func GetChatPostAction(c echo.Context) error {
 	err := Base.CheckMessage(msg)
 	if err != 0 {
 		response, _ := Data.NewResponse(c, err, channel_id_user, nil)
-		return c.JSON(http.StatusBadRequest, response) // should be same Statuscode as NewResponse
+		_, error_code_org, _ := Data.GetErrorByResult(err)
+		return c.JSON(error_code_org, response) // should be same Statuscode as NewResponse
 	}
 	res_exists_channel := Base.ChannelExists(channel_id_user)
 	if res_exists_channel != 0 {
 		response_org, _ := Data.NewResponse(c, res_exists_channel, channel_id_user, nil)
-		return c.JSON(http.StatusBadRequest, response_org) // should be same Statuscode as NewResponse
+		_, error_code_org2, _ := Data.GetErrorByResult(res_exists_channel)
+		return c.JSON(error_code_org2, response_org) // should be same Statuscode as NewResponse
 	}
 
 	// fmt.Println(msg)
@@ -35,14 +37,16 @@ func GetChatPostAction(c echo.Context) error {
 	res := DB.InsertMsg(IChannel_id_ser, rand.Intn(999), user, msg, time.Now().String(), 0)
 	if res != 0 {
 		response, _ := Data.NewResponse(c, res, channel_id_user, nil)
-		return c.JSON(http.StatusBadRequest, response)
+		_, error_code_org3, _ := Data.GetErrorByResult(res_exists_channel)
+		return c.JSON(error_code_org3, response)
 	}
 	response, _ := Data.NewResponse(c, 0, channel_id_user, msg)
-	return c.JSON(http.StatusOK, response)
+	_, error_code_org4, _ := Data.GetErrorByResult(res_exists_channel)
+	return c.JSON(error_code_org4, response)
 
 }
 
-func StreamResponseJSON(c echo.Context, chat_data []*Data.Chat) error {
+func StreamResponseJSON(c echo.Context, chat_data *Data.Response) error {
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
 	c.Response().WriteHeader(http.StatusOK)
 	return json.NewEncoder(c.Response()).Encode(chat_data)
@@ -70,10 +74,23 @@ func chatActionFunc(c echo.Context) error {
 	}
 
 	fmt.Println(len(chat_collection))
-
-	// response, _ = Data.NewResponse(c, res, channel_id, chat_collection)
+	headers := c.Request().Header
+	apiKey, res_api_key := Base.BearerToken(headers)
+	if res != 0 {
+		response, _ = Data.NewResponse(c, res_api_key, channel_id, nil)
+		_, error_code_org, _ := Data.GetErrorByResult(res_api_key)
+		return c.JSON(error_code_org, response)
+	}
+	res_check_api := Base.ApiKeyIsValid(apiKey)
+	if res_check_api != 0 {
+		response, _ = Data.NewResponse(c, res_check_api, channel_id, nil)
+		_, error_code_org, _ := Data.GetErrorByResult(res_check_api)
+		return c.JSON(error_code_org, response)
+	}
+	fmt.Println("API KEY:", apiKey, "requested to server succsessfully")
+	response, _ = Data.NewResponse(c, res, channel_id, chat_collection)
 	// return c.JSON(http.StatusOK, response)
-	return StreamResponseJSON(c, chat_collection) // Stream JSON File
+	return StreamResponseJSON(c, response) // Stream JSON File
 	// return c.JSON(http.StatusAccepted, map[string]interface{}{
 	// 	"asd": "nice",
 	// })
