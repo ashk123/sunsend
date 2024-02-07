@@ -18,6 +18,8 @@ func GetChatPostAction(c echo.Context) error {
 	channel_id_user := c.Param("id")
 	user := c.FormValue("user")
 	msg := c.FormValue("message") // get the message from userres_api_key
+	create_msg_obj := &Data.Message{Sender: "asd", Date: time.Now(), Content: msg, Length: len(msg)}
+	Base.LimitCheck(create_msg_obj)
 	fmt.Println("user", user, "wants to send a message to channel", channel_id_user, ":", msg)
 	headers := c.Request().Header
 	apiKey, res_api_key := Base.BearerToken(headers)

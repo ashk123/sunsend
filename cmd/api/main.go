@@ -16,6 +16,7 @@ func main() {
 	CoreConfig.UpdateConfigs() // load bouth .env configs and user configs
 	Data.LoadWordsFromConfig() // It loads here just for test
 	CoreConfig.ShowConfigInformation()
+	// fmt.Println(Base.LimitCheck(nil))
 	// log.Println("Your API Key is: " + fmt.Sprintf("%s", CoreConfig.Configs.Server.Key))
 	// e.Use(middleware.Logger())
 	// e.Use(middleware.Recover())

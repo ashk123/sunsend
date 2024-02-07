@@ -14,7 +14,7 @@ type Response struct {
 	Code     int         `json:"CODE"`
 }
 
-func GetErrorByResult(res_code int) (string, int, string) {
+func GetErrorByResult(res_code int) (string, int, string) { // TODO: make a struct for return values instead of return 3 values
 	switch res_code {
 	case 0:
 		return "", http.StatusOK, "SUCCSESS" // Response Status Ok

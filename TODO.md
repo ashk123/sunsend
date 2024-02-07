@@ -9,3 +9,5 @@
 - [ ] User Scripts for making small plugins to expand the server capability
 - [x] Add API key feature for servers
 - [x] Make a ConfigCore to manage config files
+- [ ] Add Docker Image for running sunsend with docker \*
+- [ ] Convert the API KEY code to middleware \*

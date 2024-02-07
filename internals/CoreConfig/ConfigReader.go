@@ -13,13 +13,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type UserConfigStr struct {
-	ServerName        string `json:Server_Name`
-	ServerDescription string `json:Server_Description`
-	ServerOwner       string `json:Server_Owner`
-	ServerDateFormat  string `json:Server_Date_Format`
-}
-
 var Configs *Data.Config
 var rawapikey string
 
@@ -33,8 +26,8 @@ func getEnvConfig() (map[string]string, error) {
 	ret_values := make(map[string]string)
 	ret_values["PORT"] = os.Getenv("PORT")
 	ret_values["KEY"] = os.Getenv("KEY")
-	// copy(rawapikey[:], ret_values["KEY"]) // fix fixing some invalid memory address - TODO: Fix in better way - nice
-	rawapikey = ret_values["KEY"]
+	// copy(rawapikey[:], ret_values["KEY"])
+	rawapikey = ret_values["KEY"] // fix fixing some invalid memory address - TODO: Fix in better way - nice
 	return ret_values, nil
 }
 
@@ -53,7 +46,7 @@ func getUserConfig() map[string]interface{} {
 		log.Fatal(err.Error())
 	}
 
-	json.Unmarshal(read, &sample_config_str)
+	json.Unmarshal(read, &sample_config_str) // read the json user config file
 
 	return sample_config_str
 }
@@ -75,7 +68,7 @@ func UpdateConfigs() {
 	}
 	// TODO: get the user configs here
 	userConfig := getUserConfig()
-	fmt.Println(userConfig)
+	// fmt.Println(userConfig)
 	Configs = &Data.Config{
 		Dotenv:  envconfigs,
 		Uconfig: nil, // for now just a little cute nil ^^

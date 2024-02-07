@@ -6,6 +6,7 @@ import (
 	"strings"
 	"sunsend/internals/DB"
 	"sunsend/internals/Data"
+	"time"
 )
 
 func IsEqulTo(message string) bool {
@@ -24,6 +25,16 @@ func CheckMessage(message string) int {
 		return 12 // response 12 -> Word error
 	}
 	return 0
+}
+
+// TODO: Make a time limit for each request by temping some amounth of client request and check the free time between them
+// Average free time will be 10 seconds for each request
+// But it will be a configable option for users (admins)
+func LimitCheck(new_msg *Data.Message) int {
+	result := time.Now().Compare(new_msg.Date)
+	fmt.Println("This is the time:", result)
+	return 0
+
 }
 
 func FindMsgsByChannelID(ID string) ([]*Data.Chat, int) {
