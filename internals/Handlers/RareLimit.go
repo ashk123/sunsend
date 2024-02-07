@@ -2,16 +2,11 @@ package Handlers
 
 import (
 	"encoding/json"
+	"sunsend/internals/Data"
 
 	"github.com/didip/tollbooth/v7"
 	"github.com/didip/tollbooth/v7/limiter"
 )
-
-type LimitErrorSample struct {
-	Err  string
-	Body string
-	Code int
-}
 
 // var (
 // 	ipRateLimiter *limiter.Limiter
@@ -22,14 +17,11 @@ func GetLimiterMiddleWare() *limiter.Limiter {
 	limiter := tollbooth.NewLimiter(0.4, nil) // 1 request in 3 seconds
 	// limiter.SetBurst(2) // e.g burst requests in max seconds
 	limiter.SetMessageContentType("application/json")
-	message := &LimitErrorSample{
-		Err:  "FIALD",
-		Body: "you reached the 1 sec request",
-		Code: 400,
-	}
-	jsonMessage, _ := json.Marshal(message)
+	response, _ := Data.NewResponse(nil, 18, "", nil)
+	jsonMessage, _ := json.Marshal(response)
 	limiter.SetMessage(string(jsonMessage))
-	limiter.SetStatusCode(message.Code)
+	_, code, _ := Data.GetErrorByResult(18)
+	limiter.SetStatusCode(code)
 	return limiter
 }
 

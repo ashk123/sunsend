@@ -30,6 +30,8 @@ func GetErrorByResult(res_code int) (string, int, string) { // TODO: make a stru
 		return "There is a problem in the system", http.StatusServiceUnavailable, "FAILD" // response Status Error - Server has problem (bug)
 	case 17:
 		return "Invalid API KEY", http.StatusBadRequest, "FAILD" // response Status Error - invalid api key
+	case 18:
+		return "You Reached the Limit request time", http.StatusForbidden, "FAILD" // respponse Status error - Reached request limit
 	default:
 		return "There is a problem", http.StatusNotAcceptable, "FAILD" // Response Status Error - uknown Eror
 	}
