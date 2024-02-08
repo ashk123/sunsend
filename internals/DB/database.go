@@ -27,6 +27,12 @@ func createDataBase() {
 
 // A function for prepare some works about database
 func PrepairDBSystem() {
+	if _, err := os.Stat("Storge"); os.IsNotExist(err) {
+		err := os.Mkdir("Storage", os.ModePerm)
+		if err != nil {
+			log.Fatal(err.Error()) // If program can't make the Storage folder
+		}
+	}
 	if _, err := os.Stat("Storage/SunSend.db"); os.IsNotExist(err) {
 		createDataBase()
 		createBaseTable()
