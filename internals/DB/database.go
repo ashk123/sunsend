@@ -2,6 +2,7 @@ package DB
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
@@ -28,9 +29,12 @@ func createDataBase() {
 // A function for prepare some works about database
 func PrepairDBSystem() {
 	if _, err := os.Stat("Storge"); os.IsNotExist(err) {
+		log.Println("There is not any Storage folder, let's craete one ...")
 		err := os.Mkdir("Storage", os.ModePerm)
 		if err != nil {
-			log.Fatal(err.Error()) // If program can't make the Storage folder
+			fmt.Println(err.Error()) // If program can't make the Storage folder
+		} else {
+			log.Println("Storage folder Created.")
 		}
 	}
 	if _, err := os.Stat("Storage/SunSend.db"); os.IsNotExist(err) {
