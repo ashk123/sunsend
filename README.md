@@ -1,4 +1,4 @@
-<h1 align="center">SunSend s simple and fast message board</h1>
+<h1 align="center">SunSend a simple and fast message board</h1>
 
 <h3>Notice: it's still in progress</h3>
 
