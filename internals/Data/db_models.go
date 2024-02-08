@@ -1,7 +1,5 @@
 package Data
 
-import "time"
-
 type Channel struct {
 	ID          int
 	Name        string
@@ -10,7 +8,7 @@ type Channel struct {
 }
 
 // Base Chat Structure
-type Chat struct {
+type Message struct {
 	CID     int
 	MID     int
 	Author  string
@@ -19,9 +17,9 @@ type Chat struct {
 	ReplyID int
 }
 
-type Message struct {
-	Sender  string
-	Date    time.Time
-	Content string
-	Length  int
-}
+// type Message struct {
+// 	Sender  string
+// 	Date    time.Time
+// 	Content string
+// 	Length  int
+// }

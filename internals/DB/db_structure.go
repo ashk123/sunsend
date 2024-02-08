@@ -40,6 +40,8 @@ func createBaseTable() int {
 	log.Println("Base Channels table created")
 	// CreateMessageTable()
 
+	// CID -> Channel ID integer
+	// MID -> Message ID integer
 	base_messages_table := `CREATE TABLE Messages (
 		"CID" integer NOT NULL,	
 		"MID" integer NOT NULL PRIMARY KEY,	
@@ -65,6 +67,7 @@ func QueryRows(query string) (*sql.Rows, int) {
 	defer db.Close()
 	if err != nil {
 		// log.Fatal(err)
+		fmt.Println(err.Error())
 		return nil, 16
 	}
 

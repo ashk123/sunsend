@@ -6,8 +6,9 @@
 - [x] Add Database to save messages
 - [ ] Add Server Route for more information about server
 - [ ] Add managment panel for config server
-- [ ] User Scripts for making small plugins to expand the server capability
+- [ ] Add more user configs
 - [x] Add API key feature for servers
 - [x] Make a ConfigCore to manage config files
 - [ ] Add Docker Image for running sunsend with docker \*
-- [ ] Convert the API KEY code to middleware \*
+- [x] Convert the API KEY code to middleware \*
+- [ ] Make a error model to cover the config errors

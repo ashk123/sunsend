@@ -2,5 +2,5 @@
     "Server_Name": "SunSend Default Server",
     "Server_Description": "This is the default sunsend server",
     "Server_Owner": "SunSend",
-    "Server_Date_Format": "full"
+    "Server_Date_Format": "small"
 }

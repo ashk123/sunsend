@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"strings"
 	"sunsend/internals/Base"
 	"sunsend/internals/DB"
 	"sunsend/internals/Data"
@@ -16,10 +17,10 @@ import (
 
 func GetChatPostAction(c echo.Context) error {
 	channel_id_user := c.Param("id")
+	// flags := c.Request().Header
+
 	user := c.FormValue("user")
 	msg := c.FormValue("message") // get the message from userres_api_key
-	create_msg_obj := &Data.Message{Sender: "asd", Date: time.Now(), Content: msg, Length: len(msg)}
-	Base.LimitCheck(create_msg_obj)
 	fmt.Println("user", user, "wants to send a message to channel", channel_id_user, ":", msg)
 	// headers := c.Request().Header
 	// apiKey, res_api_key := Base.BearerToken(headers)
@@ -72,6 +73,7 @@ func StreamResponseJSON(c echo.Context, chat_data *Data.Response) error {
 func chatActionFunc(c echo.Context) error {
 	// Handle the Chat Channel with c.Param("id")
 	channel_id := c.Param("id")
+	var chat_collection []*Data.Message
 	var response *Data.Response
 	res_exists_channel := Base.ChannelExists(channel_id) // if channel exists
 
@@ -81,14 +83,33 @@ func chatActionFunc(c echo.Context) error {
 		return c.JSON(error_code_org, response)
 	}
 	fmt.Println(res_exists_channel)
-	chat_collection, res := Base.FindMsgsByChannelID(channel_id)
-	if res != 0 {
-		response, _ = Data.NewResponse(c, 11, channel_id, nil)
-		_, error_code_org2, _ := Data.GetErrorByResult(res)
-		return c.JSON(error_code_org2, response)
-	}
+	get_message_range := c.QueryParam("range")
+	if get_message_range != "" { // If user wants to have specific amount of data
+		data_spl := strings.Split(get_message_range, "-")
+		// fmt.Println(data_spl)
+		start, _ := strconv.Atoi(data_spl[0])
+		finish, _ := strconv.Atoi(data_spl[1])
+		fmt.Println("between", start, "and", finish)
+		chat_collection_custom, res := Base.GetMessageByOffset(channel_id, start, finish)
 
+		if res != 0 {
+			response, _ = Data.NewResponse(c, 11, channel_id, nil)
+			_, error_code_org2, _ := Data.GetErrorByResult(res)
+			return c.JSON(error_code_org2, response)
+		}
+		response, _ = Data.NewResponse(c, res, channel_id, chat_collection_custom)
+	} else {
+		chat_collection, res := Base.FindMsgsByChannelID(channel_id)
+		if res != 0 {
+			response, _ = Data.NewResponse(c, 11, channel_id, nil)
+			_, error_code_org2, _ := Data.GetErrorByResult(res)
+			return c.JSON(error_code_org2, response)
+		}
+		response, _ = Data.NewResponse(c, res, channel_id, chat_collection)
+
+	}
 	fmt.Println(len(chat_collection))
+
 	// headers := c.Request().Header
 	// apiKey, res_api_key := Base.BearerToken(headers)
 	// if res_api_key != 0 {
@@ -103,7 +124,7 @@ func chatActionFunc(c echo.Context) error {
 	// 	return c.JSON(error_code_org, response)
 	// }
 	// fmt.Println("API KEY:", apiKey, "requested to server succsessfully")
-	response, _ = Data.NewResponse(c, res, channel_id, chat_collection)
+	// response, _ = Data.NewResponse(c, res, channel_id, chat_collection)
 	// return c.JSON(http.StatusOK, response)
 	return StreamResponseJSON(c, response) // Stream JSON File
 	// return c.JSON(http.StatusAccepted, map[string]interface{}{
