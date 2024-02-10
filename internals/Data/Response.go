@@ -45,7 +45,7 @@ func GetErrorByResult(res_code int) *Error { // TODO: make a struct for return v
 		// 	Res:        "FAILD",
 		// }
 	case 11:
-		return GenerateNewError("There is not any channel", http.StatusBadRequest, "FAILD") // Response Status Error - No Channel
+		return GenerateNewError("There is not any channel with this ID", http.StatusNotFound, "FAILD") // Response Status Error - No Channel
 		// return &Error{
 		// 	Content:    "There is not any channel",
 		// 	StatusCode: http.StatusBadRequest,
@@ -71,6 +71,9 @@ func GetErrorByResult(res_code int) *Error { // TODO: make a struct for return v
 		return GenerateNewError("Invalid API KEY", http.StatusBadRequest, "FAILD") // response Status Error - invalid api key
 	case 18:
 		return GenerateNewError("You Reached the Limit request time", http.StatusForbidden, "FAILD") // respponse Status error - Reached request limit
+	case 19:
+		return GenerateNewError("There is not any message with that ID", http.StatusNotFound, "FAILD")
+
 	default:
 		return GenerateNewError("There is a problem", http.StatusNotAcceptable, "FAILD") // Response Status Error - uknown Eror
 	}

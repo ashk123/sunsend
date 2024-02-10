@@ -85,7 +85,8 @@ func UpdateConfigs() {
 	// fmt.Println(userConfig)
 	Configs = &Data.Config{
 		Dotenv:  envconfigs,
-		Uconfig: nil, // for now just a little cute nil ^^
+		Uconfig: nil,                             // for now just a little cute nil ^^
+		Bin:     userConfig["Server_Bin"].(bool), // turn on bin option
 		Server: &Data.Server{ // TODO: will holds data from user config file
 			Name:        userConfig["Server_Name"].(string),
 			Description: userConfig["Server_Description"].(string),
