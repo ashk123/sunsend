@@ -13,9 +13,11 @@ There is 2 program for using sunsend:
 1. Server Side Program (backend): A program that can provide the chat system written in go (in progress)
 2. Client Side program (frontend): A program that can provide a interface for using server side program written in JS (soon)
 
-For sending messages, you need to specify the special channel, each channel has some ID that you can find in the API documentation (in progress)
+For sending messages, you need to specify the special channel, each channel has a ID that provram will randomly generate it for,you can find more information in the API documentation (in progress)
 
 This repo is a server side Rest API that provide the chat system, if you wanna just use the chat in your website, you need to see the client repo (in progress)
+I'm trying to make server clientless, that means you can make a client base on your server for yourself.
+but if you wanna make your own client you need to know some standard rules, you can find them in the repo (soon)
 
 For more things, you can checkout TODO.md
 <br/>
