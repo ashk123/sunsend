@@ -19,9 +19,13 @@ func GetLimiterMiddleWare() *limiter.Limiter {
 	limiter.SetMessageContentType("application/json")
 	response, _ := Data.NewResponse(nil, 18, "", nil)
 	jsonMessage, _ := json.Marshal(response)
+	// limiter.SetOnLimitReached(func(w http.ResponseWriter, r *http.Request) {
+	// 	limiter.ExecOnLimitReached(w, r)
+	// 	fmt.Println("user reached the limit of the server")
+	// })
 	limiter.SetMessage(string(jsonMessage))
-	_, code, _ := Data.GetErrorByResult(18)
-	limiter.SetStatusCode(code)
+	error_obj := Data.GetErrorByResult(18)
+	limiter.SetStatusCode(error_obj.StatusCode)
 	return limiter
 }
 

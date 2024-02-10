@@ -3,6 +3,7 @@ package Routes
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -21,7 +22,8 @@ func GetChatPostAction(c echo.Context) error {
 
 	user := c.FormValue("user")
 	msg := c.FormValue("message") // get the message from userres_api_key
-	fmt.Println("user", user, "wants to send a message to channel", channel_id_user, ":", msg)
+	// fmt.Println("user", user, "wants to send a message to channel", channel_id_user, ":", msg)
+	log.Println("user", user, "wants to send a message to channel", channel_id_user, ":", msg)
 	// headers := c.Request().Header
 	// apiKey, res_api_key := Base.BearerToken(headers)
 	// if res_api_key != 0 {
@@ -38,14 +40,14 @@ func GetChatPostAction(c echo.Context) error {
 	err := Base.CheckMessage(msg)
 	if err != 0 {
 		response, _ := Data.NewResponse(c, err, channel_id_user, nil)
-		_, error_code_org, _ := Data.GetErrorByResult(err)
-		return c.JSON(error_code_org, response) // should be same Statuscode as NewResponse
+		error_obj := Data.GetErrorByResult(err)
+		return c.JSON(error_obj.StatusCode, response) // should be same Statuscode as NewResponse
 	}
 	res_exists_channel := Base.ChannelExists(channel_id_user)
 	if res_exists_channel != 0 {
 		response_org, _ := Data.NewResponse(c, res_exists_channel, channel_id_user, nil)
-		_, error_code_org2, _ := Data.GetErrorByResult(res_exists_channel)
-		return c.JSON(error_code_org2, response_org) // should be same Statuscode as NewResponse
+		error_obj2 := Data.GetErrorByResult(res_exists_channel)
+		return c.JSON(error_obj2.StatusCode, response_org) // should be same Statuscode as NewResponse
 	}
 
 	// fmt.Println(msg)
@@ -53,12 +55,12 @@ func GetChatPostAction(c echo.Context) error {
 	res := DB.InsertMsg(IChannel_id_ser, rand.Intn(999), user, msg, time.Now().String(), 0)
 	if res != 0 {
 		response, _ := Data.NewResponse(c, res, channel_id_user, nil)
-		_, error_code_org3, _ := Data.GetErrorByResult(res_exists_channel)
-		return c.JSON(error_code_org3, response)
+		error_obj3 := Data.GetErrorByResult(res_exists_channel)
+		return c.JSON(error_obj3.StatusCode, response)
 	}
 	response, _ := Data.NewResponse(c, 0, channel_id_user, msg)
-	_, error_code_org4, _ := Data.GetErrorByResult(res_exists_channel)
-	return c.JSON(error_code_org4, response)
+	error_obj4 := Data.GetErrorByResult(res_exists_channel)
+	return c.JSON(error_obj4.StatusCode, response)
 
 }
 
@@ -72,42 +74,32 @@ func StreamResponseJSON(c echo.Context, chat_data *Data.Response) error {
 // TODO: It's better to *Stream* the JSON message file
 func chatActionFunc(c echo.Context) error {
 	// Handle the Chat Channel with c.Param("id")
+	flags := Data.Flags{SetRangeMessage: []string{}} // initial of flags
 	channel_id := c.Param("id")
 	var chat_collection []*Data.Message
+	get_message_range := c.QueryParam("range")
 	var response *Data.Response
 	res_exists_channel := Base.ChannelExists(channel_id) // if channel exists
 
 	if res_exists_channel != 0 {
 		response, _ = Data.NewResponse(c, res_exists_channel, channel_id, nil)
-		_, error_code_org, _ := Data.GetErrorByResult(res_exists_channel)
-		return c.JSON(error_code_org, response)
+		error_obj := Data.GetErrorByResult(res_exists_channel)
+		return c.JSON(error_obj.StatusCode, response)
 	}
 	fmt.Println(res_exists_channel)
-	get_message_range := c.QueryParam("range")
 	if get_message_range != "" { // If user wants to have specific amount of data
 		data_spl := strings.Split(get_message_range, "-")
-		// fmt.Println(data_spl)
-		start, _ := strconv.Atoi(data_spl[0])
-		finish, _ := strconv.Atoi(data_spl[1])
-		fmt.Println("between", start, "and", finish)
-		chat_collection_custom, res := Base.GetMessageByOffset(channel_id, start, finish)
-
-		if res != 0 {
-			response, _ = Data.NewResponse(c, 11, channel_id, nil)
-			_, error_code_org2, _ := Data.GetErrorByResult(res)
-			return c.JSON(error_code_org2, response)
-		}
-		response, _ = Data.NewResponse(c, res, channel_id, chat_collection_custom)
-	} else {
-		chat_collection, res := Base.FindMsgsByChannelID(channel_id)
-		if res != 0 {
-			response, _ = Data.NewResponse(c, 11, channel_id, nil)
-			_, error_code_org2, _ := Data.GetErrorByResult(res)
-			return c.JSON(error_code_org2, response)
-		}
-		response, _ = Data.NewResponse(c, res, channel_id, chat_collection)
-
+		flags.SetRangeMessage = data_spl
+		// fmt.Println(flags.SetRangeMessage)
 	}
+
+	chat_collection, res := Base.FindMsgsByChannelID(channel_id, flags)
+	if res != 0 {
+		response, _ = Data.NewResponse(c, 11, channel_id, nil)
+		error_obj2 := Data.GetErrorByResult(res)
+		return c.JSON(error_obj2.StatusCode, response)
+	}
+	response, _ = Data.NewResponse(c, res, channel_id, chat_collection)
 	fmt.Println(len(chat_collection))
 
 	// headers := c.Request().Header

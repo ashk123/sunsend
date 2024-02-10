@@ -12,12 +12,12 @@ func channelRouteAction(c echo.Context) error {
 	channel, res := Base.GetChannelByID(c, channel_id)
 	if res != 0 {
 		response, _ := Data.NewResponse(c, res, channel_id, nil)
-		_, error_code_org, _ := Data.GetErrorByResult(res)
-		return c.JSON(error_code_org, response)
+		error_obj := Data.GetErrorByResult(res)
+		return c.JSON(error_obj.StatusCode, response)
 	}
 	response_good, _ := Data.NewResponse(c, res, channel_id, channel)
-	_, error_code_org, _ := Data.GetErrorByResult(res)
-	return c.JSON(error_code_org, response_good)
+	error_obj2 := Data.GetErrorByResult(res)
+	return c.JSON(error_obj2.StatusCode, response_good)
 	// return c.JSON(http.StatusOK, response)
 }
 

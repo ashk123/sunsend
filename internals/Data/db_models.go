@@ -1,5 +1,9 @@
 package Data
 
+/*
+	Special Models for using Database
+*/
+
 type Channel struct {
 	ID          int
 	Name        string
