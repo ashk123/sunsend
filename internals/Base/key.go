@@ -5,7 +5,7 @@ import (
 	"crypto/subtle"
 	"fmt"
 	"strings"
-	"sunsend/internals/CoreConfig"
+	"sunsend/internals/Data"
 )
 
 // Doc: https://dev.to/caiorcferreira/implementing-a-safe-and-sound-api-key-authorization-middleware-in-go-3g2c
@@ -32,7 +32,8 @@ func BearerToken(headers map[string][]string) (string, int) {
 func ApiKeyIsValid(user_api_key string) int {
 	// hash := sha256.Sum256([]byte(user_api_key))
 	// key := hash[:]
-	if subtle.ConstantTimeCompare([]byte(CoreConfig.Configs.Server.Key), []byte(user_api_key)) == 1 {
+	temp := GetTemp()
+	if subtle.ConstantTimeCompare([]byte(temp.Get("config").(*Data.Config).Server.Key), []byte(user_api_key)) == 1 {
 		return 0
 	}
 

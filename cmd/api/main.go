@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sunsend/internals/Base"
 	"sunsend/internals/CoreConfig"
 	"sunsend/internals/DB"
 	"sunsend/internals/Data"
@@ -13,6 +14,7 @@ import (
 
 func main() {
 	e := echo.New()
+	temp := Base.GetTemp()
 	CoreConfig.UpdateConfigs() // load bouth .env configs and user configs
 	Data.LoadWordsFromConfig() // It loads here just for test
 	CoreConfig.ShowConfigInformation()
@@ -26,5 +28,5 @@ func main() {
 	Handlers.Handler(e)
 	DB.PrepairDBSystem()
 
-	e.Logger.Fatal(e.Start(":" + CoreConfig.Configs.Dotenv["PORT"]))
+	e.Logger.Fatal(e.Start(":" + temp.Get("config").(*Data.Config).Dotenv["PORT"]))
 }

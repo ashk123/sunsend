@@ -7,13 +7,14 @@ import (
 	"io"
 	"log"
 	"os"
+	"sunsend/internals/Base"
 	"sunsend/internals/Data"
 	"time"
 
 	"github.com/joho/godotenv"
 )
 
-var Configs *Data.Config
+var configs *Data.Config
 var rawapikey string
 
 func getEnvConfig() (map[string]string, error) {
@@ -54,10 +55,10 @@ func getUserConfig() map[string]interface{} {
 func ShowConfigInformation() {
 	fmt.Println("=========================")
 	fmt.Println("Server Config Information")
-	fmt.Println("Server Name:", Configs.Server.Name)
-	fmt.Println("Server Description:", Configs.Server.Description)
-	fmt.Println("Server Owner:", Configs.Server.Owner)
-	fmt.Println("Server Date:", Configs.Server.Date)
+	fmt.Println("Server Name:", configs.Server.Name)
+	fmt.Println("Server Description:", configs.Server.Description)
+	fmt.Println("Server Owner:", configs.Server.Owner)
+	fmt.Println("Server Date:", configs.Server.Date)
 	fmt.Println("=========================")
 }
 
@@ -83,7 +84,7 @@ func UpdateConfigs() {
 	// TODO: get the user configs here
 	userConfig := getUserConfig()
 	// fmt.Println(userConfig)
-	Configs = &Data.Config{
+	configs = &Data.Config{
 		Dotenv:  envconfigs,
 		Uconfig: nil,                             // for now just a little cute nil ^^
 		Bin:     userConfig["Server_Bin"].(bool), // turn on bin option
@@ -95,4 +96,8 @@ func UpdateConfigs() {
 			Key:         rawapikey,
 		},
 	}
+	// temp values for better performance
+	temp := Base.GetTemp()
+	temp.Add("config", configs)
+
 }
