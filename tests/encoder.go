@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"sunsend/internals/Base"
-	"sunsend/internals/Data"
 
 	"github.com/klauspost/compress/zstd"
 )
@@ -23,56 +21,56 @@ func main() {
 	// fmt.Println("UTF-8 version of that encoded:", string(encoded))
 	// fmt.Println("Main Byte of that string:", []byte("welcome"))
 	// fmt.Printf(string(decoded))
-	msg := &Data.Message{
-		CID:     123,
-		MID:     124123,
-		Author:  "eiko",
-		Content: "welcome",
-		Date:    "nice",
-		ReplyID: 0,
-	}
-	Base.AddArchive(msg)
-	msg2 := &Data.Message{
-		CID:     123,
-		MID:     124123,
-		Author:  "eiko",
-		Content: "welcome",
-		Date:    "nice",
-		ReplyID: 0,
-	}
-	Base.AddArchive(msg2)
-	msg3 := &Data.Message{
-		CID:     123,
-		MID:     124123,
-		Author:  "eiko",
-		Content: "welcome",
-		Date:    "nice",
-		ReplyID: 0,
-	}
-	Base.AddArchive(msg3)
-	msg4 := &Data.Message{
-		CID:     123,
-		MID:     124123,
-		Author:  "eiko",
-		Content: "welcome",
-		Date:    "nice",
-		ReplyID: 0,
-	}
-	Base.AddArchive(msg4)
-	fmt.Println("Level 1 - open the archive file by reading it")
-	res, err := Base.OpenArchive("2024_1_12")
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	for i, v := range res {
-		fmt.Println(i, v)
-	}
-	fmt.Println("=============================")
-	fmt.Println("Level 2 - open the archive file from temp")
-	for i2, v2 := range Base.GetValue("archive").([]*Data.Message) {
-		fmt.Println(i2, v2)
-	}
-
+	// msg := &Data.Message{
+	// 	CID:     123,
+	// 	MID:     124123,
+	// 	Author:  "eiko",
+	// 	Content: "welcome",
+	// 	Date:    "nice",
+	// 	ReplyID: 0,
+	// }
+	// Base.AddArchive(msg)
+	// msg2 := &Data.Message{
+	// 	CID:     123,
+	// 	MID:     124123,
+	// 	Author:  "eiko",
+	// 	Content: "welcome",
+	// 	Date:    "nice",
+	// 	ReplyID: 0,
+	// }
+	// Base.AddArchive(msg2)
+	// msg3 := &Data.Message{
+	// 	CID:     123,
+	// 	MID:     124123,
+	// 	Author:  "eiko",
+	// 	Content: "welcome",
+	// 	Date:    "nice",
+	// 	ReplyID: 0,
+	// }
+	// Base.AddArchive(msg3)
+	// msg4 := &Data.Message{
+	// 	CID:     123,
+	// 	MID:     124123,
+	// 	Author:  "eiko",
+	// 	Content: "welcome",
+	// 	Date:    "nice",
+	// 	ReplyID: 0,
+	// }
+	// Base.AddArchive(msg4)
+	// fmt.Println("Level 1 - open the archive file by reading it")
+	// res, err := Base.OpenArchive("2024_1_12")
+	// if err != nil {
+	// 	fmt.Println(err.Error())
+	// }
+	// for i, v := range res {
+	// 	fmt.Println(i, v)
+	// }
+	// fmt.Println("=============================")
+	// fmt.Println("Level 2 - open the archive file from temp")
+	// for i2, v2 := range Base.GetValue("archive").([]*Data.Message) {
+	// 	fmt.Println(i2, v2)
+	// }
+	Base.ArchivCheckSystem()
 	// defer f.Close()
 	// // v, _ := r4.ReadByte()
 	// // fmt.Println(v)

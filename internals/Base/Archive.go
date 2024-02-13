@@ -1,12 +1,14 @@
 package Base
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
+	"sunsend/internals/DB"
 	"sunsend/internals/Data"
 	"time"
 
@@ -66,6 +68,72 @@ func AddArchive(message *Data.Message) {
 	defer f.Close()
 	f.Write(encoded_res)
 	log.Println("System Created a archive file of old messages")
+}
+
+func getOldMessages() ([]*Data.Message, int) {
+	var data []*Data.Message
+	count := getRowsLength()
+	if count < 1 || count == -1 {
+		return nil, 19 // error there is not enought messages in the DB
+	}
+	rows, res := DB.QueryRows("SELECT * FROM Messages ORDER BY Date DESC LIMIT 5")
+	if res != 0 {
+		return nil, res
+	}
+
+	for rows.Next() {
+		var user_CID int
+		var user_MID int
+		var user_Author string
+		var user_Content string
+		var user_Date string
+		var user_ReplyID int
+		err := rows.Scan(&user_CID, &user_MID, &user_Author, &user_Content, &user_Date, &user_ReplyID)
+		if err != nil {
+			log.Println(err.Error())
+			return nil, 16
+		}
+		Chat := &Data.Message{
+			CID:     user_CID,
+			MID:     user_MID,
+			Author:  user_Author,
+			Content: user_Content,
+			Date:    user_Date,
+			ReplyID: user_ReplyID,
+		}
+		data = append(data, Chat)
+	}
+	return data, 0
+
+}
+
+func getRowsLength() int {
+	rows, err := DB.QueryRows("SELECT COUNT(*) as count FROM Messages")
+	if err != 0 {
+		return 16
+	}
+	return checkCount(rows)
+}
+
+func checkCount(rows *sql.Rows) (count int) {
+	for rows.Next() {
+		err := rows.Scan(&count)
+		if err != nil {
+			log.Println(err.Error())
+			return -1
+		}
+	}
+	return count
+}
+
+func ArchivCheckSystem() {
+	msgs, res := getOldMessages()
+	if res != 0 {
+		log.Println("there is not any old messages")
+	}
+	for i, v := range msgs {
+		fmt.Println(i, v)
+	}
 }
 
 func OpenArchive(date string) ([]*Data.Message, error) {

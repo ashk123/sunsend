@@ -111,7 +111,8 @@ func FindMsgsByChannelID(ID string, flags Data.Flags) ([]*Data.Message, int) {
 		var user_ReplyID int
 		err := message_rows.Scan(&user_CID, &user_MID, &user_Author, &user_Content, &user_Date, &user_ReplyID)
 		if err != nil {
-			log.Fatal(err.Error())
+			log.Println(err.Error())
+			return nil, 16
 		}
 		Chat := &Data.Message{
 			CID:     user_CID,
