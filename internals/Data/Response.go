@@ -73,7 +73,6 @@ func GetErrorByResult(res_code int) *Error { // TODO: make a struct for return v
 		return GenerateNewError("You Reached the Limit request time", http.StatusForbidden, "FAILD") // respponse Status error - Reached request limit
 	case 19:
 		return GenerateNewError("There is not any message with that ID", http.StatusNotFound, "FAILD")
-
 	default:
 		return GenerateNewError("There is a problem", http.StatusNotAcceptable, "FAILD") // Response Status Error - uknown Eror
 	}

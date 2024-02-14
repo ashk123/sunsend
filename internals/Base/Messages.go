@@ -68,7 +68,7 @@ func Itsr(data int) string {
 
 // }
 
-func FindMsgByChannelID(CID string, MID string, flags Data.Flags) (*Data.Message, int) {
+func FindMsgByChannelID(CID string, MID string, flags *Data.Flags) (*Data.Message, int) {
 	message_rows := DB.QueryRow("SELECT * FROM Messages WHERE CID == " + CID + " AND MID == " + MID)
 	var user_cid, user_mid, user_ReplyID int
 	var user_Author, user_Content, user_Date string
@@ -87,7 +87,7 @@ func FindMsgByChannelID(CID string, MID string, flags Data.Flags) (*Data.Message
 	return msg_obj, 0
 }
 
-func FindMsgsByChannelID(ID string, flags Data.Flags) ([]*Data.Message, int) {
+func FindMsgsByChannelID(ID string, flags *Data.Flags) ([]*Data.Message, int) {
 	var message_rows *sql.Rows
 	var res int
 	if len(flags.SetRangeMessage) >= 1 {

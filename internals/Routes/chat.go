@@ -74,8 +74,9 @@ func StreamResponseJSON(c echo.Context, chat_data *Data.Response) error {
 // TODO: It's better to *Stream* the JSON message file
 func chatActionFunc(c echo.Context) error {
 	// Handle the Chat Channel with c.Param("id")
-	flags := Data.Flags{SetRangeMessage: []string{}} // initial of flags
+	flags := &Data.Flags{SetRangeMessage: []string{}} // initial of flags
 	channel_id := c.Param("id")
+	find_id := c.QueryParam("find")
 	var chat_collection []*Data.Message
 	get_message_range := c.QueryParam("range")
 	var response *Data.Response
@@ -86,7 +87,22 @@ func chatActionFunc(c echo.Context) error {
 		error_obj := Data.GetErrorByResult(res_exists_channel)
 		return c.JSON(error_obj.StatusCode, response)
 	}
-	fmt.Println(res_exists_channel)
+
+	// If user just wants to find a message
+	if find_id != "" {
+		// if the data is digit
+		chat_collection, res := Base.FindMsgByChannelID(channel_id, find_id, nil)
+		if res != 0 {
+			response, _ = Data.NewResponse(c, res, channel_id, nil)
+			error_obj2 := Data.GetErrorByResult(res)
+			return c.JSON(error_obj2.StatusCode, response)
+		}
+		response, _ = Data.NewResponse(c, res, channel_id, chat_collection)
+		return c.JSON(http.StatusOK, response)
+	}
+
+	// Otherwise user wants to have the group of messages from a channel
+	// fmt.Println(res_exists_channel)
 	if get_message_range != "" { // If user wants to have specific amount of data
 		data_spl := strings.Split(get_message_range, "-")
 		flags.SetRangeMessage = data_spl
