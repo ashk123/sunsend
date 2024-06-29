@@ -67,7 +67,7 @@ func QueryRows(query string) (*sql.Rows, int) {
 	defer db.Close()
 	if err != nil {
 		// log.Fatal(err)
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 		return nil, 16
 	}
 

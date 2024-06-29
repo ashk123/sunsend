@@ -68,6 +68,26 @@ func Itsr(data int) string {
 
 // }
 
+func FindMsgByUsername(CID string, User string, flags *Data.Flags) (*Data.Message, int) {
+	message_rows := DB.QueryRow("SELECT * FROM Messages WHERE CID == " + CID + " AND Author == " + User)
+	var user_cid, user_mid, user_ReplyID int
+	var user_Author, user_Content, user_Date string
+	err := message_rows.Scan(&user_cid, &user_mid, &user_Author, &user_Content, &user_Date, &user_ReplyID)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, 19
+	}
+	msg_obj := &Data.Message{
+		CID:     user_cid,
+		MID:     user_mid,
+		Author:  user_Author,
+		Content: user_Content,
+		Date:    user_Date,
+		ReplyID: user_ReplyID,
+	}
+	return msg_obj, 0
+}
+
 func FindMsgByChannelID(CID string, MID string, flags *Data.Flags) (*Data.Message, int) {
 	message_rows := DB.QueryRow("SELECT * FROM Messages WHERE CID == " + CID + " AND MID == " + MID)
 	var user_cid, user_mid, user_ReplyID int
@@ -123,6 +143,52 @@ func FindMsgsByChannelID(ID string, flags *Data.Flags) ([]*Data.Message, int) {
 			ReplyID: user_ReplyID,
 		}
 		data = append(data, Chat)
+	}
+	return data, 0 // handle the error
+}
+
+func FindMsgsByUsername(ID string, User string, flags *Data.Flags) ([]*Data.Message, int) {
+	var message_rows *sql.Rows
+	var res int
+	if len(flags.SetRangeMessage) >= 1 {
+		message_rows, res = DB.QueryRows("SELECT * FROM Messages WHERE CID == " + ID + " LIMIT " + flags.SetRangeMessage[0] + " OFFSET " + flags.SetRangeMessage[1])
+	} else {
+		message_rows, res = DB.QueryRows("SELECT * FROM Messages WHERE Author == " + fmt.Sprintf("'%s'", User))
+	}
+	data := []*Data.Message{}
+	// message_rows, res := DB.QueryRows("SELECT * FROM Messages WHERE CID == " + ID)
+	if res != 0 {
+		return nil, res
+	}
+	// var asd []byte
+	// message_rows.Scan(asd)
+	// log.Println("The result if your SQL is:", asd)
+	defer message_rows.Close()
+	// fmt.Println(channel_rows)
+	for message_rows.Next() { // Iterate and fetch the records from result cursor
+		var user_CID int
+		var user_MID int
+		var user_Author string
+		var user_Content string
+		var user_Date string
+		var user_ReplyID int
+		err := message_rows.Scan(&user_CID, &user_MID, &user_Author, &user_Content, &user_Date, &user_ReplyID)
+		if err != nil {
+			log.Println(err.Error())
+			return nil, 16
+		}
+		Chat := &Data.Message{
+			CID:     user_CID,
+			MID:     user_MID,
+			Author:  user_Author,
+			Content: user_Content,
+			Date:    user_Date,
+			ReplyID: user_ReplyID,
+		}
+		data = append(data, Chat)
+	}
+	if len(data) == 0 {
+		return nil, 21
 	}
 	return data, 0 // handle the error
 }

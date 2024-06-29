@@ -12,3 +12,4 @@
 - [ ] Add Docker Image for running sunsend with docker \*
 - [x] Convert the API KEY code to middleware \*
 - [ ] Make a error model to cover the config errors
+- [ ] Add Replay Message (make it works :/)

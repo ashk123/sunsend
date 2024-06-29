@@ -12,6 +12,9 @@ doc:
 	echo "welcome" > doc
 	echo "Done."
 
+restart:
+	rm -rf Storage/SunSend.db
+	# And remove other configuration files
 config:
 	mkdir -p Config/
 	touch Config/config.json

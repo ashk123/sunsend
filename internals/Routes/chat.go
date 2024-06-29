@@ -19,7 +19,6 @@ import (
 func GetChatPostAction(c echo.Context) error {
 	channel_id_user := c.Param("id")
 	// flags := c.Request().Header
-
 	user := c.FormValue("user")
 	msg := c.FormValue("message") // get the message from userres_api_key
 	// fmt.Println("user", user, "wants to send a message to channel", channel_id_user, ":", msg)
@@ -47,7 +46,10 @@ func GetChatPostAction(c echo.Context) error {
 	if res_exists_channel != 0 {
 		response_org, _ := Data.NewResponse(c, res_exists_channel, channel_id_user, nil)
 		error_obj2 := Data.GetErrorByResult(res_exists_channel)
-		return c.JSON(error_obj2.StatusCode, response_org) // should be same Statuscode as NewResponse
+		return c.JSON(
+			error_obj2.StatusCode,
+			response_org,
+		) // should be same Statuscode as NewResponse
 	}
 
 	// fmt.Println(msg)
@@ -77,6 +79,7 @@ func chatActionFunc(c echo.Context) error {
 	flags := &Data.Flags{SetRangeMessage: []string{}} // initial of flags
 	channel_id := c.Param("id")
 	find_id := c.QueryParam("find")
+	user_name_search := c.QueryParam("username")
 	var chat_collection []*Data.Message
 	get_message_range := c.QueryParam("range")
 	var response *Data.Response
@@ -86,6 +89,18 @@ func chatActionFunc(c echo.Context) error {
 		response, _ = Data.NewResponse(c, res_exists_channel, channel_id, nil)
 		error_obj := Data.GetErrorByResult(res_exists_channel)
 		return c.JSON(error_obj.StatusCode, response)
+	}
+
+	if user_name_search != "" {
+		//log.Printf("a%sa", user_name_search)
+		chat_collection_by_user, res := Base.FindMsgsByUsername(channel_id, user_name_search, flags)
+		if res != 0 {
+			response, _ = Data.NewResponse(c, res, channel_id, nil)
+			error_obj2 := Data.GetErrorByResult(res)
+			return c.JSON(error_obj2.StatusCode, response)
+		}
+		response, _ = Data.NewResponse(c, res, channel_id, chat_collection_by_user)
+		return c.JSON(http.StatusOK, response)
 	}
 
 	// If user just wants to find a message
