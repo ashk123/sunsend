@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"mime/multipart"
 
 	_ "modernc.org/sqlite"
 )
@@ -48,6 +49,7 @@ func createBaseTable() int {
 		"Author" TEXT,
 		"Content" TEXT,
 		"Date" TEXT,
+		"Image" TEXT,
 		"ReplyID" Integer
 	  );` // SQL Statement for Create Table
 	defer db_work.Close()
@@ -133,9 +135,17 @@ func InsertChannel(user_ID int, user_Name string, user_Descriptin string, user_O
 	return 0
 }
 
-func InsertMsg(CID int, MID int, Author string, Content string, Date string, ReplyID int) int {
+func InsertMsg(
+	CID int,
+	MID int,
+	Author string,
+	Content string,
+	Date string,
+	Image *multipart.FileHeader,
+	ReplyID int,
+) int {
 	db := getbasedb()
-	inserMessageBase := `INSERT INTO Messages(CID, MID, Author, Content, Date, ReplyID) VALUES (?, ?, ?, ?, ?, ?)`
+	inserMessageBase := `INSERT INTO Messages(CID, MID, Author, Content, Date, Image, ReplyID) VALUES (?, ?, ?, ?, ?, ?, ?)`
 	statement, err := db.Prepare(inserMessageBase) // Prepare statement.
 	defer db.Close()
 	// This is good to avoid SQL injections
@@ -145,13 +155,20 @@ func InsertMsg(CID int, MID int, Author string, Content string, Date string, Rep
 		return 16
 	}
 
-	_, err = statement.Exec(CID, MID, Author, Content, Date, ReplyID)
+	image_file_name := "None"
+	if Image != nil {
+		image_file_name = Image.Filename
+	}
+	_, err = statement.Exec(CID, MID, Author, Content, Date, image_file_name, ReplyID)
 	if err != nil {
 		// log.Fatalln(err.Error())
 		fmt.Println("1", err.Error())
 
 		return 16
 	}
+	//if image_file_name != "None" {
+	//	Base.SaveImageFile(Image)
+	//}
 	log.Println("User", Author, "Sent Message to channel", CID)
 	return 0
 }

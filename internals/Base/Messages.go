@@ -69,10 +69,21 @@ func Itsr(data int) string {
 // }
 
 func FindMsgByUsername(CID string, User string, flags *Data.Flags) (*Data.Message, int) {
-	message_rows := DB.QueryRow("SELECT * FROM Messages WHERE CID == " + CID + " AND Author == " + User)
+	message_rows := DB.QueryRow(
+		"SELECT * FROM Messages WHERE CID == " + CID + " AND Author == " + User,
+	)
 	var user_cid, user_mid, user_ReplyID int
 	var user_Author, user_Content, user_Date string
-	err := message_rows.Scan(&user_cid, &user_mid, &user_Author, &user_Content, &user_Date, &user_ReplyID)
+	var user_image string
+	err := message_rows.Scan(
+		&user_cid,
+		&user_mid,
+		&user_Author,
+		&user_Content,
+		&user_Date,
+		&user_image,
+		&user_ReplyID,
+	)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, 19
@@ -83,6 +94,7 @@ func FindMsgByUsername(CID string, User string, flags *Data.Flags) (*Data.Messag
 		Author:  user_Author,
 		Content: user_Content,
 		Date:    user_Date,
+		Image:   user_image,
 		ReplyID: user_ReplyID,
 	}
 	return msg_obj, 0
@@ -92,7 +104,16 @@ func FindMsgByChannelID(CID string, MID string, flags *Data.Flags) (*Data.Messag
 	message_rows := DB.QueryRow("SELECT * FROM Messages WHERE CID == " + CID + " AND MID == " + MID)
 	var user_cid, user_mid, user_ReplyID int
 	var user_Author, user_Content, user_Date string
-	err := message_rows.Scan(&user_cid, &user_mid, &user_Author, &user_Content, &user_Date, &user_ReplyID)
+	var user_image string
+	err := message_rows.Scan(
+		&user_cid,
+		&user_mid,
+		&user_Author,
+		&user_Content,
+		&user_Date,
+		&user_image,
+		&user_ReplyID,
+	)
 	if err != nil {
 		return nil, 19
 	}
@@ -101,6 +122,7 @@ func FindMsgByChannelID(CID string, MID string, flags *Data.Flags) (*Data.Messag
 		MID:     user_mid,
 		Author:  user_Author,
 		Content: user_Content,
+		Image:   user_image,
 		Date:    user_Date,
 		ReplyID: user_ReplyID,
 	}
@@ -111,7 +133,9 @@ func FindMsgsByChannelID(ID string, flags *Data.Flags) ([]*Data.Message, int) {
 	var message_rows *sql.Rows
 	var res int
 	if len(flags.SetRangeMessage) >= 1 {
-		message_rows, res = DB.QueryRows("SELECT * FROM Messages WHERE CID == " + ID + " LIMIT " + flags.SetRangeMessage[0] + " OFFSET " + flags.SetRangeMessage[1])
+		message_rows, res = DB.QueryRows(
+			"SELECT * FROM Messages WHERE CID == " + ID + " LIMIT " + flags.SetRangeMessage[0] + " OFFSET " + flags.SetRangeMessage[1],
+		)
 	} else {
 		message_rows, res = DB.QueryRows("SELECT * FROM Messages WHERE CID == " + ID)
 	}
@@ -128,8 +152,17 @@ func FindMsgsByChannelID(ID string, flags *Data.Flags) ([]*Data.Message, int) {
 		var user_Author string
 		var user_Content string
 		var user_Date string
+		var user_Image string
 		var user_ReplyID int
-		err := message_rows.Scan(&user_CID, &user_MID, &user_Author, &user_Content, &user_Date, &user_ReplyID)
+		err := message_rows.Scan(
+			&user_CID,
+			&user_MID,
+			&user_Author,
+			&user_Content,
+			&user_Date,
+			&user_Image,
+			&user_ReplyID,
+		)
 		if err != nil {
 			log.Println(err.Error())
 			return nil, 16
@@ -140,6 +173,7 @@ func FindMsgsByChannelID(ID string, flags *Data.Flags) ([]*Data.Message, int) {
 			Author:  user_Author,
 			Content: user_Content,
 			Date:    user_Date,
+			Image:   user_Image,
 			ReplyID: user_ReplyID,
 		}
 		data = append(data, Chat)
@@ -151,7 +185,9 @@ func FindMsgsByUsername(ID string, User string, flags *Data.Flags) ([]*Data.Mess
 	var message_rows *sql.Rows
 	var res int
 	if len(flags.SetRangeMessage) >= 1 {
-		message_rows, res = DB.QueryRows("SELECT * FROM Messages WHERE CID == " + ID + " LIMIT " + flags.SetRangeMessage[0] + " OFFSET " + flags.SetRangeMessage[1])
+		message_rows, res = DB.QueryRows(
+			"SELECT * FROM Messages WHERE CID == " + ID + " LIMIT " + flags.SetRangeMessage[0] + " OFFSET " + flags.SetRangeMessage[1],
+		)
 	} else {
 		message_rows, res = DB.QueryRows("SELECT * FROM Messages WHERE Author == " + fmt.Sprintf("'%s'", User))
 	}
@@ -171,8 +207,17 @@ func FindMsgsByUsername(ID string, User string, flags *Data.Flags) ([]*Data.Mess
 		var user_Author string
 		var user_Content string
 		var user_Date string
+		var user_Image string
 		var user_ReplyID int
-		err := message_rows.Scan(&user_CID, &user_MID, &user_Author, &user_Content, &user_Date, &user_ReplyID)
+		err := message_rows.Scan(
+			&user_CID,
+			&user_MID,
+			&user_Author,
+			&user_Content,
+			&user_Date,
+			&user_Image,
+			&user_ReplyID,
+		)
 		if err != nil {
 			log.Println(err.Error())
 			return nil, 16
@@ -183,6 +228,7 @@ func FindMsgsByUsername(ID string, User string, flags *Data.Flags) ([]*Data.Mess
 			Author:  user_Author,
 			Content: user_Content,
 			Date:    user_Date,
+			Image:   user_Image,
 			ReplyID: user_ReplyID,
 		}
 		data = append(data, Chat)

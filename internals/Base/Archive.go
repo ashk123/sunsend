@@ -62,9 +62,24 @@ func AddArchive(message *Data.Message) {
 	var res_Content string = message.Content
 	var res_Date string = message.Date
 	var res_ReplyID int = message.ReplyID
-	encoded_text_org := Itsr(res_CID) + "-" + Itsr(res_MID) + "-" + res_Author + "-" + res_Content + "-" + res_Date + "-" + Itsr(res_ReplyID) + "+"
+	encoded_text_org := Itsr(
+		res_CID,
+	) + "-" + Itsr(
+		res_MID,
+	) + "-" + res_Author + "-" + res_Content + "-" + res_Date + "-" + Itsr(
+		res_ReplyID,
+	) + "+"
 	encoded_res := Compress([]byte(encoded_text_org))
-	f, _ := os.OpenFile("Archive_"+fmt.Sprintf("%d_%d_%d", time.Now().Year(), time.Now().Weekday(), time.Now().Day())+".arc", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, _ := os.OpenFile(
+		"Archive_"+fmt.Sprintf(
+			"%d_%d_%d",
+			time.Now().Year(),
+			time.Now().Weekday(),
+			time.Now().Day(),
+		)+".arc",
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		0644,
+	)
 	defer f.Close()
 	f.Write(encoded_res)
 	log.Println("System Created a archive file of old messages")
@@ -88,7 +103,14 @@ func getOldMessages() ([]*Data.Message, int) {
 		var user_Content string
 		var user_Date string
 		var user_ReplyID int
-		err := rows.Scan(&user_CID, &user_MID, &user_Author, &user_Content, &user_Date, &user_ReplyID)
+		err := rows.Scan(
+			&user_CID,
+			&user_MID,
+			&user_Author,
+			&user_Content,
+			&user_Date,
+			&user_ReplyID,
+		)
 		if err != nil {
 			log.Println(err.Error())
 			return nil, 16
@@ -112,6 +134,7 @@ func getRowsLength() int {
 	if err != 0 {
 		return 16
 	}
+	// TODO: Replace the chcekCount function with a simple Scan
 	return checkCount(rows)
 }
 

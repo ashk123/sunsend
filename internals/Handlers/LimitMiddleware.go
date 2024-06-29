@@ -17,15 +17,14 @@ func GetLimiterMiddleWare() *limiter.Limiter {
 	limiter := tollbooth.NewLimiter(0.4, nil) // 1 request in 3 seconds
 	// limiter.SetBurst(2) // e.g burst requests in max seconds
 	limiter.SetMessageContentType("application/json")
-	response, _ := Data.NewResponse(nil, 18, "", nil)
+	response, _ := Data.NewResponse(18, "", nil, "")
 	jsonMessage, _ := json.Marshal(response)
 	// limiter.SetOnLimitReached(func(w http.ResponseWriter, r *http.Request) {
 	// 	limiter.ExecOnLimitReached(w, r)
 	// 	fmt.Println("user reached the limit of the server")
 	// })
 	limiter.SetMessage(string(jsonMessage))
-	error_obj := Data.GetErrorByResult(18)
-	limiter.SetStatusCode(error_obj.StatusCode)
+	limiter.SetStatusCode(response.Code)
 	return limiter
 }
 

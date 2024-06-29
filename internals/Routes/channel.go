@@ -11,13 +11,11 @@ func channelRouteAction(c echo.Context) error {
 	channel_id := c.Param("id")
 	channel, res := Base.GetChannelByID(c, channel_id)
 	if res != 0 {
-		response, _ := Data.NewResponse(c, res, channel_id, nil)
-		error_obj := Data.GetErrorByResult(res)
-		return c.JSON(error_obj.StatusCode, response)
+		response, _ := Data.NewResponse(res, channel_id, nil, "")
+		return c.JSON(response.Code, response)
 	}
-	response_good, _ := Data.NewResponse(c, res, channel_id, channel)
-	error_obj2 := Data.GetErrorByResult(res)
-	return c.JSON(error_obj2.StatusCode, response_good)
+	response_good, _ := Data.NewResponse(res, channel_id, channel, "")
+	return c.JSON(response_good.Code, response_good)
 	// return c.JSON(http.StatusOK, response)
 }
 

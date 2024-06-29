@@ -20,6 +20,20 @@ func GetChatPostAction(c echo.Context) error {
 	channel_id_user := c.Param("id")
 	// flags := c.Request().Header
 	user := c.FormValue("user")
+	image_file_name := ""
+	image, err1 := c.FormFile("image")
+	if err1 == nil {
+		fres := Base.HandleFiles(image)
+		if fres != 0 {
+			response_file, _ := Data.NewResponse(fres, channel_id_user, nil, "")
+			return c.JSON(
+				response_file.Code,
+				response_file,
+			)
+		}
+		image_file_name = image.Filename
+	}
+	fmt.Println("A:LKSD:LAKSD:ALKSD:AKSD:A")
 	msg := c.FormValue("message") // get the message from userres_api_key
 	// fmt.Println("user", user, "wants to send a message to channel", channel_id_user, ":", msg)
 	log.Println("user", user, "wants to send a message to channel", channel_id_user, ":", msg)
@@ -38,31 +52,35 @@ func GetChatPostAction(c echo.Context) error {
 	// }
 	err := Base.CheckMessage(msg)
 	if err != 0 {
-		response, _ := Data.NewResponse(c, err, channel_id_user, nil)
-		error_obj := Data.GetErrorByResult(err)
-		return c.JSON(error_obj.StatusCode, response) // should be same Statuscode as NewResponse
+		response, _ := Data.NewResponse(err, channel_id_user, nil, "")
+		return c.JSON(response.Code, response) // should be same Statuscode as NewResponse
 	}
 	res_exists_channel := Base.ChannelExists(channel_id_user)
 	if res_exists_channel != 0 {
-		response_org, _ := Data.NewResponse(c, res_exists_channel, channel_id_user, nil)
-		error_obj2 := Data.GetErrorByResult(res_exists_channel)
+		response_org, _ := Data.NewResponse(res_exists_channel, channel_id_user, nil, "")
 		return c.JSON(
-			error_obj2.StatusCode,
+			response_org.Code,
 			response_org,
 		) // should be same Statuscode as NewResponse
 	}
 
 	// fmt.Println(msg)
 	IChannel_id_ser, _ := strconv.Atoi(channel_id_user)
-	res := DB.InsertMsg(IChannel_id_ser, rand.Intn(999), user, msg, time.Now().String(), 0)
+	res := DB.InsertMsg(IChannel_id_ser, rand.Intn(999), user, msg, time.Now().String(), image, 0)
 	if res != 0 {
-		response, _ := Data.NewResponse(c, res, channel_id_user, nil)
-		error_obj3 := Data.GetErrorByResult(res_exists_channel)
-		return c.JSON(error_obj3.StatusCode, response)
+		response, _ := Data.NewResponse(res, channel_id_user, nil, "")
+		return c.JSON(response.Code, response)
 	}
-	response, _ := Data.NewResponse(c, 0, channel_id_user, msg)
-	error_obj4 := Data.GetErrorByResult(res_exists_channel)
-	return c.JSON(error_obj4.StatusCode, response)
+	if image != nil {
+		err := Base.SaveImageFile(image)
+		if err != nil {
+			response_error, _ := Data.NewResponse(15, channel_id_user, nil, "")
+			return c.JSON(response_error.Code, response_error)
+		}
+
+	}
+	response, _ := Data.NewResponse(0, channel_id_user, msg, image_file_name)
+	return c.JSON(response.Code, response)
 
 }
 
@@ -86,20 +104,18 @@ func chatActionFunc(c echo.Context) error {
 	res_exists_channel := Base.ChannelExists(channel_id) // if channel exists
 
 	if res_exists_channel != 0 {
-		response, _ = Data.NewResponse(c, res_exists_channel, channel_id, nil)
-		error_obj := Data.GetErrorByResult(res_exists_channel)
-		return c.JSON(error_obj.StatusCode, response)
+		response, _ = Data.NewResponse(res_exists_channel, channel_id, nil, "")
+		return c.JSON(response.Code, response)
 	}
 
 	if user_name_search != "" {
 		//log.Printf("a%sa", user_name_search)
 		chat_collection_by_user, res := Base.FindMsgsByUsername(channel_id, user_name_search, flags)
 		if res != 0 {
-			response, _ = Data.NewResponse(c, res, channel_id, nil)
-			error_obj2 := Data.GetErrorByResult(res)
-			return c.JSON(error_obj2.StatusCode, response)
+			response, _ = Data.NewResponse(res, channel_id, nil, "")
+			return c.JSON(response.Code, response)
 		}
-		response, _ = Data.NewResponse(c, res, channel_id, chat_collection_by_user)
+		response, _ = Data.NewResponse(res, channel_id, chat_collection_by_user, "")
 		return c.JSON(http.StatusOK, response)
 	}
 
@@ -108,12 +124,11 @@ func chatActionFunc(c echo.Context) error {
 		// if the data is digit
 		chat_collection, res := Base.FindMsgByChannelID(channel_id, find_id, nil)
 		if res != 0 {
-			response, _ = Data.NewResponse(c, res, channel_id, nil)
-			error_obj2 := Data.GetErrorByResult(res)
-			return c.JSON(error_obj2.StatusCode, response)
+			response, _ = Data.NewResponse(res, channel_id, nil, "")
+			return c.JSON(response.Code, response)
 		}
-		response, _ = Data.NewResponse(c, res, channel_id, chat_collection)
-		return c.JSON(http.StatusOK, response)
+		response, _ = Data.NewResponse(res, channel_id, chat_collection, "")
+		return c.JSON(response.Code, response)
 	}
 
 	// Otherwise user wants to have the group of messages from a channel
@@ -126,12 +141,11 @@ func chatActionFunc(c echo.Context) error {
 
 	chat_collection, res := Base.FindMsgsByChannelID(channel_id, flags)
 	if res != 0 {
-		response, _ = Data.NewResponse(c, 11, channel_id, nil)
-		error_obj2 := Data.GetErrorByResult(res)
-		return c.JSON(error_obj2.StatusCode, response)
+		response, _ = Data.NewResponse(11, channel_id, nil, "")
+		return c.JSON(response.Code, response)
 	}
-	response, _ = Data.NewResponse(c, res, channel_id, chat_collection)
-	fmt.Println(len(chat_collection))
+	response, _ = Data.NewResponse(http.StatusOK, channel_id, chat_collection, "")
+	//fmt.Println(len(chat_collection))
 
 	// headers := c.Request().Header
 	// apiKey, res_api_key := Base.BearerToken(headers)

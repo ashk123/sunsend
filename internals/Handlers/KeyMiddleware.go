@@ -18,15 +18,13 @@ func CheckAPIKey() echo.MiddlewareFunc {
 			var response *Data.Response
 			apiKey, res_api_key := Base.BearerToken(headers)
 			if res_api_key != 0 {
-				response, _ = Data.NewResponse(c, res_api_key, channel_id, nil)
-				error_obj := Data.GetErrorByResult(res_api_key)
-				return c.JSON(error_obj.StatusCode, response)
+				response, _ = Data.NewResponse(res_api_key, channel_id, nil, "")
+				return c.JSON(response.Code, response)
 			}
 			res_check_api := Base.ApiKeyIsValid(apiKey)
 			if res_check_api != 0 {
-				response, _ = Data.NewResponse(c, res_check_api, channel_id, nil)
-				error_obj2 := Data.GetErrorByResult(res_check_api)
-				return c.JSON(error_obj2.StatusCode, response)
+				response, _ = Data.NewResponse(res_check_api, channel_id, nil, "")
+				return c.JSON(response.Code, response)
 			}
 			fmt.Println("API KEY:", apiKey, "requested to server succsessfully")
 			return next(c)

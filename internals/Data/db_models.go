@@ -18,6 +18,7 @@ type Message struct {
 	Author  string
 	Content string
 	Date    string
+	Image   string
 	ReplyID int
 }
 
