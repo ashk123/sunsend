@@ -1,11 +1,8 @@
 <h1 align="center">SunSend a simple and fast message board</h1>
 
-<h3>Notice: it's still in progress</h3>
+<h4>Notice: it's still in progress</h4>
 
-<hr>
-
-### How it works ?
-
+## How it works ?
 Welcome to the world of Message Boards :-)
 
 There is 2 program for using sunsend:
@@ -20,11 +17,8 @@ I'm trying to make server clientless, that means you can make a client base on y
 but if you wanna make your own client you need to know some standard rules, you can find them in the repo (soon)
 
 For more things, you can checkout TODO.md
-<br/>
-<br/>
-<br/>
 
-### How does API KEY works?
+## How does API KEY works?
 
 SunSend server has Client (or you can write one) and for connecting to the server, you need to select your **special** server
 
@@ -40,10 +34,7 @@ for generating api key:
 make setup
 ```
 
-<br/>
-<br/>
-
-### How to run the server?
+## How to run the server?
 
 For running SunSend you need to do somethings before running it
 <br/>
@@ -72,8 +63,5 @@ _Fourth_, you can finnally run your server with command:
 make run
 ```
 
-<br/>
-<br/>
-<br/>
 
 **Build and run SunSend (soon)**
