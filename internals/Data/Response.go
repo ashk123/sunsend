@@ -138,6 +138,12 @@ func GetResponseByResult(
 			http.StatusAccepted,
 			"FAILD",
 		)
+	case 27:
+		return GenerateNewError(
+			"There is not any imag file with that name",
+			http.StatusNotFound,
+			"FAILD",
+		)
 	default:
 		return GenerateNewError(
 			"",

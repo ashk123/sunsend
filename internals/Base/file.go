@@ -1,6 +1,7 @@
 package Base
 
 import (
+	"bytes"
 	"errors"
 	"io"
 	"log"
@@ -10,16 +11,38 @@ import (
 )
 
 const (
-	FILE_SIZE int64 = 1024 * 10
+	FILE_SIZE int64 = (1024 ^ 2) * 5 // 5MB Of data
 )
 
+func DecompressFile(filename string) ([]byte, int) {
+	//f, _ := os.Create("/tmp/TEMP_" + filename)
+	compresed_file, _ := os.ReadFile("Storage/" + filename + ".zst")
+	file_data, err := Decompress(compresed_file)
+	if err != nil {
+		return nil, 26
+	}
+	return file_data, 0
+	//f.Write(file_daata)
+}
+
+func StreamToByte(stream io.Reader) []byte {
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(stream)
+	return buf.Bytes()
+}
+
+func IsFileExists(filePath string) bool {
+
+	_, error := os.Stat(filePath)
+	//return !os.IsNotExist(err)
+	return !errors.Is(error, os.ErrNotExist)
+}
 func SaveImageFile(image *multipart.FileHeader) error {
 	//buf := new(strings.Builder)
-	//n, err := io.Copy(buf, r)
 	// check errors
 	//fmt.Println(buf.String())
 
-	f, err := os.Create("Storage/" + image.Filename)
+	f, err := os.Create("Storage/" + image.Filename + ".zst")
 	if err != nil {
 		log.Println("ERROR: err to save file")
 		return errors.New("can't create file")
@@ -29,9 +52,15 @@ func SaveImageFile(image *multipart.FileHeader) error {
 		log.Println("ERROR: err to save file 1")
 		return errors.New("Can't Read Image")
 	}
-	if _, err = io.Copy(f, actual); err != nil {
-		return errors.New("Can't Copy the Image Data")
-	}
+	image_bytes_org := StreamToByte(actual)
+	//io.Copy(buf, actual)
+	//fmt.Println(image_bytes_org)
+	compresed_image_data := Compress(image_bytes_org)
+
+	//if _, err = io.Copy(f, actual); err != nil {
+	//	return errors.New("Can't Copy the Image Data")
+	//}
+	f.Write(compresed_image_data)
 	defer f.Close()
 	return nil
 }
