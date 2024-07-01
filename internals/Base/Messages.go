@@ -2,6 +2,7 @@ package Base
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -68,6 +69,48 @@ func Itsr(data int) string {
 
 // }
 
+func Unmarshal(Rows *sql.Rows) ([]Data.Message, error) {
+	data := []Data.Message{}
+	defer Rows.Close()
+	// fmt.Println(channel_rows)
+	for Rows.Next() { // Iterate and fetch the records from result cursor
+		var user_CID int
+		var user_MID int
+		var user_Author string
+		var user_Content string
+		var user_Date string
+		var user_Image string
+		var user_ReplyID int
+		err := Rows.Scan(
+			&user_CID,
+			&user_MID,
+			&user_Author,
+			&user_Content,
+			&user_Date,
+			&user_Image,
+			&user_ReplyID,
+		)
+		if err != nil {
+			log.Println(err.Error())
+			return nil, errors.New("ERROR: can't Read from database cause: " + err.Error())
+		}
+		if user_Image != "None" {
+			user_Image = Data.MEDIA_ROUTE + "/" + user_Image
+		}
+		Chat := Data.Message{
+			CID:     user_CID,
+			MID:     user_MID,
+			Author:  user_Author,
+			Content: user_Content,
+			Date:    user_Date,
+			Image:   user_Image,
+			ReplyID: user_ReplyID,
+		}
+		data = append(data, Chat)
+	}
+	return data, nil
+}
+
 func FindMsgByUsername(CID string, User string, flags *Data.Flags) (*Data.Message, int) {
 	message_rows := DB.QueryRow(
 		"SELECT * FROM Messages WHERE CID == " + CID + " AND Author == " + User,
@@ -129,7 +172,7 @@ func FindMsgByChannelID(CID string, MID string, flags *Data.Flags) (*Data.Messag
 	return msg_obj, 0
 }
 
-func FindMsgsByChannelID(ID string, flags *Data.Flags) ([]*Data.Message, int) {
+func FindMsgsByChannelID(ID string, flags *Data.Flags) ([]Data.Message, int) {
 	var message_rows *sql.Rows
 	var res int
 	if len(flags.SetRangeMessage) >= 1 {
@@ -139,44 +182,14 @@ func FindMsgsByChannelID(ID string, flags *Data.Flags) ([]*Data.Message, int) {
 	} else {
 		message_rows, res = DB.QueryRows("SELECT * FROM Messages WHERE CID == " + ID)
 	}
-	data := []*Data.Message{}
 	// message_rows, res := DB.QueryRows("SELECT * FROM Messages WHERE CID == " + ID)
 	if res != 0 {
 		return nil, res
 	}
-	defer message_rows.Close()
-	// fmt.Println(channel_rows)
-	for message_rows.Next() { // Iterate and fetch the records from result cursor
-		var user_CID int
-		var user_MID int
-		var user_Author string
-		var user_Content string
-		var user_Date string
-		var user_Image string
-		var user_ReplyID int
-		err := message_rows.Scan(
-			&user_CID,
-			&user_MID,
-			&user_Author,
-			&user_Content,
-			&user_Date,
-			&user_Image,
-			&user_ReplyID,
-		)
-		if err != nil {
-			log.Println(err.Error())
-			return nil, 16
-		}
-		Chat := &Data.Message{
-			CID:     user_CID,
-			MID:     user_MID,
-			Author:  user_Author,
-			Content: user_Content,
-			Date:    user_Date,
-			Image:   user_Image,
-			ReplyID: user_ReplyID,
-		}
-		data = append(data, Chat)
+
+	data, err := Unmarshal(message_rows)
+	if err != nil {
+		return nil, 16
 	}
 	return data, 0 // handle the error
 }

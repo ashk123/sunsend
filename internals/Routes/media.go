@@ -1,6 +1,7 @@
 package Routes
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"sunsend/internals/Base"
@@ -28,6 +29,9 @@ func media_route_action(c echo.Context) error {
 }
 
 func GetMediaRoute() *Route {
-	media_route_obj := NewRoute("/api/v1/media/:file_name", media_route_action)
+	media_route_obj := NewRoute(
+		fmt.Sprintf("/api/%s/media/:file_name", Data.API_VERSION),
+		media_route_action,
+	)
 	return media_route_obj
 }

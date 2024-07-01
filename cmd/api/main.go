@@ -27,7 +27,7 @@ func main() {
 			case value := <-ticker.C:
 				fmt.Println(value)
 				//fmt.Println("this is the Ticker that I had")
-				//Base.ControlUnit(value)
+				Base.ControlUnit(value)
 			}
 		}
 	}()
@@ -41,5 +41,5 @@ func main() {
 	Handlers.Handler(e)
 	DB.PrepairDBSystem()
 
-	e.Logger.Fatal(e.Start(":" + temp.Get("config").(*Data.Config).Dotenv["PORT"]))
+	e.Logger.Fatal(e.Start("127.0.0.1:" + temp.Get("config").(*Data.Config).Dotenv["PORT"]))
 }

@@ -13,3 +13,4 @@
 - [x] Convert the API KEY code to middleware \*
 - [ ] Make a error model to cover the config errors
 - [ ] Add Replay Message (make it works :/)
+- [ ] Add Configuration for Image size, and other things

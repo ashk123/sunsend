@@ -66,7 +66,16 @@ func GetChatPostAction(c echo.Context) error {
 
 	// fmt.Println(msg)
 	IChannel_id_ser, _ := strconv.Atoi(channel_id_user)
-	res := DB.InsertMsg(IChannel_id_ser, rand.Intn(999), user, msg, time.Now().String(), image, 0)
+	crt := time.Now()
+	res := DB.InsertMsg(
+		IChannel_id_ser,
+		rand.Intn(999),
+		user,
+		msg,
+		fmt.Sprintf("%d/%d/%d", crt.Year(), crt.Month(), crt.Day()),
+		image,
+		0,
+	)
 	if res != 0 {
 		response, _ := Data.NewResponse(res, channel_id_user, nil, "")
 		return c.JSON(response.Code, response)
@@ -98,7 +107,7 @@ func chatActionFunc(c echo.Context) error {
 	channel_id := c.Param("id")
 	find_id := c.QueryParam("find")
 	user_name_search := c.QueryParam("username")
-	var chat_collection []*Data.Message
+	var chat_collection []Data.Message
 	get_message_range := c.QueryParam("range")
 	var response *Data.Response
 	res_exists_channel := Base.ChannelExists(channel_id) // if channel exists
@@ -169,11 +178,14 @@ func chatActionFunc(c echo.Context) error {
 	// })
 }
 func GetChatRoute() *Route {
-	chat_route_obj := NewRoute("/api/v1/chat/:id", chatActionFunc)
+	chat_route_obj := NewRoute(fmt.Sprintf("/api/%s/chat/:id", Data.API_VERSION), chatActionFunc)
 	return chat_route_obj
 }
 
 func GetChatPostRoute() *Route {
-	chat_post_route_obj := NewRoute("/api/v1/chat/:id", GetChatPostAction)
+	chat_post_route_obj := NewRoute(
+		fmt.Sprintf("/api/%s/chat/:id", Data.API_VERSION),
+		GetChatPostAction,
+	)
 	return chat_post_route_obj
 }

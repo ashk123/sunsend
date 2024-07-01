@@ -1,8 +1,6 @@
 package main
 
 import (
-	"sunsend/internals/Base"
-
 	"github.com/klauspost/compress/zstd"
 )
 
@@ -70,7 +68,7 @@ func main() {
 	// for i2, v2 := range Base.GetValue("archive").([]*Data.Message) {
 	// 	fmt.Println(i2, v2)
 	// }
-	Base.ArchivCheckSystem()
+	//Base.ArchivCheckSystem()
 	// defer f.Close()
 	// // v, _ := r4.ReadByte()
 	// // fmt.Println(v)
@@ -95,4 +93,5 @@ func main() {
 	// for index, value := range org {
 	// 	fmt.Println(index, value)
 	// }
+	Run()
 }

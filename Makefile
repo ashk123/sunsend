@@ -1,4 +1,4 @@
-setup:
+setup: config
 	go run cmd/gen_key.go
 
 run:
@@ -17,5 +17,6 @@ restart:
 	# And remove other configuration files
 config:
 	mkdir -p Config/
+	touch .env
 	touch Config/config.json
 	echo "Done.""

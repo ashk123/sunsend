@@ -47,7 +47,10 @@ import (
 // }
 
 func Compress(src []byte) []byte {
-	var encoder, _ = zstd.NewWriter(nil, zstd.WithEncoderLevel(zstd.SpeedBestCompression))
+	var encoder, err = zstd.NewWriter(nil, zstd.WithEncoderLevel(zstd.SpeedBestCompression))
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return encoder.EncodeAll(src, make([]byte, 0, len(src)))
 }
 func Decompress(src []byte) ([]byte, error) {
@@ -70,72 +73,87 @@ func AddArchive(message *Data.Message) {
 		res_ReplyID,
 	) + "+"
 	encoded_res := Compress([]byte(encoded_text_org))
-	f, _ := os.OpenFile(
+	fmt.Printf("%d-%d-%d\n", time.Now().Year(), time.Now().Weekday(), time.Now().Day())
+	f, err := os.OpenFile(
 		"Archive_"+fmt.Sprintf(
 			"%d_%d_%d",
 			time.Now().Year(),
-			time.Now().Weekday(),
+			time.Now().Month(),
 			time.Now().Day(),
 		)+".arc",
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0644,
 	)
+	if err != nil {
+		log.Println("[ERROR]", err.Error())
+		return
+	}
 	defer f.Close()
 	f.Write(encoded_res)
-	log.Println("System Created a archive file of old messages")
+	log.Println("[INFO] System Created a Archive file of old message with ID:", res_MID)
 }
 
-func getOldMessages() ([]*Data.Message, int) {
-	var data []*Data.Message
+func GetMessageDate() (*[]Data.Message, int) {
+	var data []Data.Message
 	count := getRowsLength()
 	if count < 1 || count == -1 {
-		return nil, 19 // error there is not enought messages in the DB
+		return nil, -1 // error there is not enought messages in the DB
 	}
-	rows, res := DB.QueryRows("SELECT * FROM Messages ORDER BY Date DESC LIMIT 5")
+	//if count < Data.ARCHIVE_LIMIT {
+	//	return nil, 1
+	//}
+	//data, res := getMessagDate()
+	//if res != 0 {
+	//	return nil, -2
+	//}
+	return &data, 0
+
+}
+
+func SubMonths(date string) string {
+	t, err := time.Parse("2006/1/2", date)
+	if err != nil {
+		return err.Error()
+	}
+	return fmt.Sprintf("%d/%d/%d", t.Year(), t.Month()-1, t.Day())
+}
+func GetOldMessages() (*[]Data.Message, int) {
+	t := time.Now()
+	ftime := fmt.Sprintf("%d/%d/%d", t.Year(), t.Month(), t.Day())
+	//stime := SubMonths(ftime)
+	//fmt.Println(ftime, stime)
+	row, res := DB.QueryRows(
+		fmt.Sprintf(
+			"SELECT * FROM Messages WHERE Date < '%s' AND Date > '%s';",
+			ftime,
+			t.AddDate(0, -3, 0),
+		),
+	)
 	if res != 0 {
-		return nil, res
+		log.Println("Error code is:", res)
+		return nil, -1
+	}
+	data, err := Unmarshal(row)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, -1
 	}
 
-	for rows.Next() {
-		var user_CID int
-		var user_MID int
-		var user_Author string
-		var user_Content string
-		var user_Date string
-		var user_ReplyID int
-		err := rows.Scan(
-			&user_CID,
-			&user_MID,
-			&user_Author,
-			&user_Content,
-			&user_Date,
-			&user_ReplyID,
-		)
-		if err != nil {
-			log.Println(err.Error())
-			return nil, 16
-		}
-		Chat := &Data.Message{
-			CID:     user_CID,
-			MID:     user_MID,
-			Author:  user_Author,
-			Content: user_Content,
-			Date:    user_Date,
-			ReplyID: user_ReplyID,
-		}
-		data = append(data, Chat)
+	if len(data) <= 0 {
+		return nil, 1
 	}
-	return data, 0
-
+	// TODO: Replace the chcekCount function with a simple Scan
+	//return checkCount(rows)
+	return &data, 0
 }
 
 func getRowsLength() int {
-	rows, err := DB.QueryRows("SELECT COUNT(*) as count FROM Messages")
-	if err != 0 {
-		return 16
-	}
+	row := DB.QueryRow("SELECT COUNT(*) as count FROM Messages")
+	var count int
+	row.Scan(&count)
 	// TODO: Replace the chcekCount function with a simple Scan
-	return checkCount(rows)
+	//return checkCount(rows)
+	return count
 }
 
 func checkCount(rows *sql.Rows) (count int) {
@@ -150,11 +168,11 @@ func checkCount(rows *sql.Rows) (count int) {
 }
 
 func ArchivCheckSystem() {
-	msgs, res := getOldMessages()
+	msgs, res := GetOldMessages()
 	if res != 0 {
 		log.Println("there is not any old messages")
 	}
-	for i, v := range msgs {
+	for i, v := range *msgs {
 		fmt.Println(i, v)
 	}
 }

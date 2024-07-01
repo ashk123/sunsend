@@ -68,7 +68,15 @@ func getTimeByMode(mode string) string {
 	case "full":
 		return time.Now().String() // just raw current time
 	case "normal":
-		return fmt.Sprintf("%d/%d/%d - %d:%d:%d", time.Now().Year(), time.Now().Weekday(), time.Now().Day(), time.Now().Hour(), time.Now().Minute(), time.Now().Second())
+		return fmt.Sprintf(
+			"%d/%d/%d - %d:%d:%d",
+			time.Now().Year(),
+			time.Now().Weekday(),
+			time.Now().Day(),
+			time.Now().Hour(),
+			time.Now().Minute(),
+			time.Now().Second(),
+		)
 	case "small":
 		return fmt.Sprintf("%d/%d/%d", time.Now().Year(), time.Now().Weekday(), time.Now().Day())
 	default:
@@ -92,7 +100,7 @@ func UpdateConfigs() {
 			Name:        userConfig["Server_Name"].(string),
 			Description: userConfig["Server_Description"].(string),
 			Owner:       userConfig["Server_Owner"].(string),
-			Date:        getTimeByMode(userConfig["Server_Date_Format"].(string)), // TODO: Check which type of date format user wants
+			Date:        userConfig["Server_Date_Format"].(string), // TODO: Check which type of date format user wants
 			Key:         rawapikey,
 		},
 	}

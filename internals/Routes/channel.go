@@ -1,6 +1,7 @@
 package Routes
 
 import (
+	"fmt"
 	"sunsend/internals/Base"
 	"sunsend/internals/Data"
 
@@ -20,6 +21,9 @@ func channelRouteAction(c echo.Context) error {
 }
 
 func GetChannelRoute() *Route {
-	channel_route_obj := NewRoute("/api/v1/channel/:id", channelRouteAction)
+	channel_route_obj := NewRoute(
+		fmt.Sprintf("/api/%s/channel/:id", Data.API_VERSION),
+		channelRouteAction,
+	)
 	return channel_route_obj
 }
