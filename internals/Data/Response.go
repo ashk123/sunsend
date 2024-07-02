@@ -150,6 +150,12 @@ func GetResponseByResult(
 			http.StatusNotFound,
 			"FAILD",
 		)
+	case 31:
+		return GenerateNewError(
+			"Entry Json is not correct",
+			400,
+			"FAILD",
+		)
 	default:
 		return GenerateNewError(
 			"",

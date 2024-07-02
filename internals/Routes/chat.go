@@ -18,7 +18,14 @@ import (
 
 func GetChatPostAction(c echo.Context) error {
 	channel_id_user := c.Param("id")
-	json_obj := ReadJSON(c)
+	json_obj, res1 := Base.ReadJSONMsg(c) // Read the JSON input from user
+	if res1 != 0 {
+		response_file, _ := Data.NewResponse(res1, channel_id_user, nil, "")
+		return c.JSON(
+			response_file.Code,
+			response_file,
+		)
+	}
 	user := json_obj.Username
 	msg := json_obj.Message
 	reply := json_obj.Reply
@@ -76,7 +83,6 @@ func GetChatPostAction(c echo.Context) error {
 
 	// fmt.Println(msg)
 	IChannel_id_ser, _ := strconv.Atoi(channel_id_user)
-	Ireply, _ := strconv.Atoi(reply)
 	crt := time.Now()
 	// TODO: response msg base on date
 	res := DB.InsertMsg(
@@ -87,7 +93,7 @@ func GetChatPostAction(c echo.Context) error {
 		fmt.Sprintf("%d/%d/%d", crt.Year(), crt.Month(), crt.Day()),
 		//crt,
 		image,
-		Ireply,
+		reply,
 	)
 	if res != 0 {
 		response, _ := Data.NewResponse(res, channel_id_user, nil, "")
@@ -110,15 +116,6 @@ func StreamResponseJSON(c echo.Context, chat_data *Data.Response) error {
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
 	c.Response().WriteHeader(http.StatusOK)
 	return json.NewEncoder(c.Response()).Encode(chat_data)
-}
-
-func ReadJSON(c echo.Context) Data.Input {
-	msg := Data.Input{}
-	err := json.NewDecoder(c.Request().Body).Decode(&msg)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	return msg
 }
 
 // This is the Get Function Runner

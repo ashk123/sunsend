@@ -18,10 +18,17 @@ type Config struct {
 	Uconfig UserConfigConf    // usr `Config` folder configs
 }
 
-type Input struct {
+type InputMsg struct {
 	Username string `json:"username",omitempty`
 	Message  string `json:"message",omitempty`
-	Reply    string `json:"reply",omitempty`
+	Reply    int    `json:"reply",omitempty`
+}
+
+type InputChan struct {
+	ID          int    `json:"id",omitempty`
+	Name        string `json:"name",omitempty`
+	Description string `json:"description",omitempty`
+	Owner       string `json:"owner",omitempty`
 }
 
 // Flags model for getMessageParameters

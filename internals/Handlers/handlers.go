@@ -37,6 +37,12 @@ func Handler(e *echo.Echo) {
 		tollbooth_echo.LimitHandler(limiter),
 		CheckAPIKey(),
 	) // set the channel Router ("/channel/:id")
+	e.POST(
+		Routes.GetChannelPostRoute().Path,
+		Routes.GetChannelPostRoute().Runner,
+		tollbooth_echo.LimitHandler(limiter),
+		CheckAPIKey(),
+	) // set the channel Router ("/channel/:id")
 	e.GET(
 		Routes.GetListRoute().Path,
 		Routes.GetListRoute().Runner,

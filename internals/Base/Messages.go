@@ -2,12 +2,15 @@ package Base
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"strings"
 	"sunsend/internals/DB"
 	"sunsend/internals/Data"
+
+	"github.com/labstack/echo/v4"
 )
 
 func IsEqulTo(message string) bool {
@@ -31,6 +34,27 @@ func CheckMessage(message string) int {
 // Very simple int to string function
 func Itsr(data int) string {
 	return fmt.Sprintf("%d", data)
+}
+
+func ReadJSONMsg(c echo.Context) (Data.InputMsg, int) {
+	msg := Data.InputMsg{}
+	err := json.NewDecoder(c.Request().Body).Decode(&msg)
+	log.Println(msg)
+	if err != nil {
+		log.Println("[ERROR] Can't Parse the JSON Message Input (Message) cause " + err.Error())
+		return Data.InputMsg{}, 31
+	}
+	return msg, 0
+}
+
+func ReadJSONChan(c echo.Context) (Data.InputChan, int) {
+	chl := Data.InputChan{}
+	err := json.NewDecoder(c.Request().Body).Decode(&chl)
+	if err != nil {
+		log.Println("[ERROR] Can't Parse the JSON Message Input (Channel)")
+		return Data.InputChan{}, 31
+	}
+	return chl, 0
 }
 
 // GetmessageByOffset will gives you, your own limit and offset for recieve  messages

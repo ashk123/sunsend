@@ -35,3 +35,15 @@ async function GetMsgs(id, range, nice) {
 	}).then((response) => response.json())
 }
 
+async function CreateChannel(name, desc, owner) {
+    return await fetch(HOST + "/channel/create", {
+	method: "POST",
+	headers: req_headers,
+	body: JSON.stringify({
+	    "name": name,
+	    "description": desc,
+	    "owner": owner,
+	}),
+    }).then((response) => response.json())
+}
+

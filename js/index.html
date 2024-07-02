@@ -33,10 +33,17 @@
 	    <div class="box" id="inbox">
 	    </div>
 	    <div class"form">
-		<input type="text" id="id" name="id" placeholder="Enter your room ID ...">
+
+		<input type="text" id="id" name="id" placeholder="Enter your Nickname ...">
 		<input type="msg" id="msg" name="msg" placeholder="Enter your room ID ...">
 		<button id="btn">Send</button>
 		<button id="rbtn">Refresh</button>
+		<br/>
+		
+		<input type="text" id="cname" name="cname" placeholder="Enter your room name ...">
+		<input type="text" id="cdesc" name="cdesc" placeholder="Enter your room description ...">
+		<input type="text" id="cowner" name="cowner" placeholder="Enter your name (Author)...">
+		<button id="cbtn">Create</button>
 	    
 	    </div>
 
@@ -89,11 +96,22 @@
 			    }
 			})
 		    }
+		    function Create() {
+			const name = document.getElementById("cname").value // user
+			const desc = document.getElementById("cdesc").value // message
+			const owner = document.getElementById("cowner").value // message
+			CreateChannel(name, desc, owner).then((resp) => {
+			    serv.innerHTML = "you created a brand new channel, with ID: " + resp.CHANNEL
+			})
+		    }
+
 		    //msgs()
 		    var btn = document.getElementById("btn")
 		    btn.addEventListener("click", Send, false)
 		    var rbtn = document.getElementById("rbtn")
 		    rbtn.addEventListener("click", msgs, false)
+		    var cbtn = document.getElementById("cbtn")
+		    cbtn.addEventListener("click", Create, false)
 		</script>
 
 	</body>
