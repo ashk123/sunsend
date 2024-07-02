@@ -16,7 +16,7 @@ import (
 
 func main() {
 	e := echo.New()
-	temp := Base.GetTemp()
+	temp := Data.GetTemp()
 	CoreConfig.UpdateConfigs() // load bouth .env configs and user configs
 	Data.LoadWordsFromConfig() // It loads here just for test
 	CoreConfig.ShowConfigInformation()

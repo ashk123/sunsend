@@ -32,8 +32,11 @@ func BearerToken(headers map[string][]string) (string, int) {
 func ApiKeyIsValid(user_api_key string) int {
 	// hash := sha256.Sum256([]byte(user_api_key))
 	// key := hash[:]
-	temp := GetTemp()
-	if subtle.ConstantTimeCompare([]byte(temp.Get("config").(*Data.Config).Server.Key), []byte(user_api_key)) == 1 {
+	temp := Data.GetTemp()
+	if subtle.ConstantTimeCompare(
+		[]byte(temp.Get("config").(*Data.Config).Dotenv["KEY"]),
+		[]byte(user_api_key),
+	) == 1 {
 		return 0
 	}
 

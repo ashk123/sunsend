@@ -211,7 +211,7 @@ func OpenArchive(date string) ([]*Data.Message, error) {
 		return nil, errors.New("there is not any data in the slice")
 	}
 	// Temp the result for better performance
-	temp := GetTemp()
+	temp := Data.GetTemp()
 	temp.Add("archive", result)
 	return result, nil
 }

@@ -29,8 +29,13 @@ func media_route_action(c echo.Context) error {
 }
 
 func GetMediaRoute() *Route {
+	temp := Data.GetTemp()
 	media_route_obj := NewRoute(
-		fmt.Sprintf("/api/%s/media/:file_name", Data.API_VERSION),
+		fmt.Sprintf(
+			"/api/%s/%s/:file_name",
+			temp.Get("config").(*Data.Config).Dotenv["ADR"],
+			temp.Get("config").(*Data.Config).Uconfig.MediaRoute,
+		),
 		media_route_action,
 	)
 	return media_route_obj

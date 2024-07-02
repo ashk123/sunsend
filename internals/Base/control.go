@@ -9,7 +9,7 @@ import (
 
 const (
 	DB_DURATION      time.Duration = time.Second * 5 // 1 Minute
-	ARCHIVE_DURATION time.Duration = time.Second * 5 // ~~~
+	ARCHIVE_DURATION time.Duration = time.Minute * 1 // ~~~
 )
 
 var (
@@ -35,7 +35,6 @@ func ControlDB() {
 }
 
 func ControlUnit(timer time.Time) {
-	//log.Println("I'm running this 3 seconds thread")
 	ctimer := time.Now()
 	//log.Println(ctimer, ARCHIVE_DURATION)
 	switch res := ctimer; {
@@ -43,15 +42,12 @@ func ControlUnit(timer time.Time) {
 		ControlDB()
 		DB_NOW = time.Now().Add(DB_DURATION)
 	case res.Compare(ARCHIVE_NOW) >= 0:
-		//ArchivCheckSystem()
 		oldmessageorg, res := GetOldMessages()
-		//log.Println(res)
 		if res == 0 {
-			// Archive the Last 5 Messages
-
-			// Delete The Last 5 Messages
 			for _, message := range *oldmessageorg {
+				// Archive the Last 5 Messages
 				AddArchive(&message)
+				// Delete The Last 5 Messages
 				res := DB.QueryRow(fmt.Sprintf("DELETE FROM Messages WHERE MID = %d", message.MID))
 				var count int
 				res.Scan(&count)

@@ -7,31 +7,24 @@ package Data
 */
 
 // Global Constant Values
+
 const (
-	API_VERSION   string = "v1"
-	HOST          string = "http://127.0.0.1:3000/api/" + API_VERSION
-	MEDIA_ROUTE   string = HOST + "/media"
-	ARCHIVE_LIMIT int    = 30
+	API_VERSION string = "v1"
 )
 
 // Config Model for server
 type Config struct {
 	Dotenv  map[string]string // .env file configs
-	Uconfig map[string]string // usr `Config` folder configs
-	Bin     bool
-	Server  *Server
+	Uconfig UserConfigConf    // usr `Config` folder configs
 }
 
 // Flags model for getMessageParameters
 type Flags struct {
 	SetRangeMessage []string
 }
-
-// Server model for server specific configs
-type Server struct {
-	Name        string
-	Description string
-	Owner       string
-	Date        string
-	Key         string
+type UserConfigConf struct {
+	Name        string `json:"Server_Name",omitempty`
+	Description string `json:"Server_Description",omitempty`
+	Owner       string `json:"Server_Owner",omitempty`
+	MediaRoute  string `json:"Media_Route",omitempty`
 }

@@ -95,7 +95,7 @@ func Unmarshal(Rows *sql.Rows) ([]Data.Message, error) {
 			return nil, errors.New("ERROR: can't Read from database cause: " + err.Error())
 		}
 		if user_Image != "None" {
-			user_Image = Data.MEDIA_ROUTE + "/" + user_Image
+			user_Image = Data.GetValue("config").(*Data.Config).Dotenv["ADR"] + "/" + Data.GetValue("config").(*Data.Config).Uconfig.MediaRoute + "/" + user_Image
 		}
 		Chat := Data.Message{
 			CID:     user_CID,
@@ -110,7 +110,6 @@ func Unmarshal(Rows *sql.Rows) ([]Data.Message, error) {
 	}
 	return data, nil
 }
-
 func FindMsgByUsername(CID string, User string, flags *Data.Flags) (*Data.Message, int) {
 	message_rows := DB.QueryRow(
 		"SELECT * FROM Messages WHERE CID == " + CID + " AND Author == " + User,

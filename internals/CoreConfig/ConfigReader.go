@@ -2,63 +2,76 @@ package CoreConfig
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
-	"sunsend/internals/Base"
 	"sunsend/internals/Data"
 	"time"
 
 	"github.com/joho/godotenv"
 )
 
-var configs *Data.Config
-var rawapikey string
+func GetEnvItems(item string) string {
+	data, exists := os.LookupEnv(item)
+	if exists == false {
+		log.Fatal("[ERROR] Can't Read the .env file")
+	}
+	return data
+}
 
-func getEnvConfig() (map[string]string, error) {
+// var configs *Data.Config
+// var rawapikey string
+func getEnvConfig() map[string]string {
 	err := godotenv.Load(".env")
 	if err != nil {
-		// log.Fatal(err.Error())
-		return nil, errors.New("invalid or can't read .env file")
+		log.Fatal("[ERROR] Can't Read .env file cause: ", err.Error())
 	}
 	// It can be better to list of all the needed Config and iterate thought them
 	ret_values := make(map[string]string)
-	ret_values["PORT"] = os.Getenv("PORT")
-	ret_values["KEY"] = os.Getenv("KEY")
-	// copy(rawapikey[:], ret_values["KEY"])
-	rawapikey = ret_values["KEY"] // fix fixing some invalid memory address - TODO: Fix in better way - nice
-	return ret_values, nil
+	ret_values["PORT"] = os.Getenv(
+		"PORT",
+	) // TODO: User LookUpEnv instead of GetEnv
+	//ret_values["HOST"] = os.Getenv("HOST")
+	ret_values["HOST"] = GetEnvItems("HOST")
+	ret_values["ADR"] = fmt.Sprintf("http://%s:%s", ret_values["HOST"], ret_values["PORT"]) // ~~~
+	ret_values["KEY"] = os.Getenv("KEY")                                                    // ~~~
+	return ret_values
 }
 
-func getUserConfig() map[string]interface{} {
+func getUserConfig() Data.UserConfigConf {
 	file, err := os.Open("Config/config.json")
 
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Println("[WARNING] Can't open .env file cause:", err.Error())
+		return Data.UserConfigConf{}
 	}
 	defer file.Close()
 
 	// sample_config_str := &UserConfigStr{}
-	var sample_config_str map[string]interface{}
+	sample_config_str := Data.UserConfigConf{}
 	read, err := io.ReadAll(file)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Println("[WARNING] Can't read User Config File", err.Error())
+		return Data.UserConfigConf{}
 	}
-
-	json.Unmarshal(read, &sample_config_str) // read the json user config file
-
+	log.Println(sample_config_str)
+	// read the json user config file
+	if err := json.Unmarshal(read, &sample_config_str); err != nil {
+		log.Fatal(err.Error())
+		return Data.UserConfigConf{}
+	}
+	log.Println("[INFO] Read the UserConfigs Succsessfully")
 	return sample_config_str
 }
 
 func ShowConfigInformation() {
+	temp := Data.GetTemp()
 	fmt.Println("=========================")
 	fmt.Println("Server Config Information")
-	fmt.Println("Server Name:", configs.Server.Name)
-	fmt.Println("Server Description:", configs.Server.Description)
-	fmt.Println("Server Owner:", configs.Server.Owner)
-	fmt.Println("Server Date:", configs.Server.Date)
+	fmt.Println("Server Name:", temp.Get("config").(*Data.Config).Uconfig.Name)
+	fmt.Println("Server Description:", temp.Get("config").(*Data.Config).Uconfig.Description)
+	fmt.Println("Server Owner:", temp.Get("config").(*Data.Config).Uconfig.Owner)
 	fmt.Println("=========================")
 }
 
@@ -85,27 +98,18 @@ func getTimeByMode(mode string) string {
 }
 
 func UpdateConfigs() {
-	envconfigs, err := getEnvConfig()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	envconfigs := getEnvConfig()
 	// TODO: get the user configs here
 	userConfig := getUserConfig()
+
 	// fmt.Println(userConfig)
-	configs = &Data.Config{
+	configs := &Data.Config{
 		Dotenv:  envconfigs,
-		Uconfig: nil,                             // for now just a little cute nil ^^
-		Bin:     userConfig["Server_Bin"].(bool), // turn on bin option
-		Server: &Data.Server{ // TODO: will holds data from user config file
-			Name:        userConfig["Server_Name"].(string),
-			Description: userConfig["Server_Description"].(string),
-			Owner:       userConfig["Server_Owner"].(string),
-			Date:        userConfig["Server_Date_Format"].(string), // TODO: Check which type of date format user wants
-			Key:         rawapikey,
-		},
+		Uconfig: userConfig, // for now just a little cute nil ^^
 	}
 	// temp values for better performance
-	temp := Base.GetTemp()
+	temp := Data.GetTemp()
 	temp.Add("config", configs)
+	log.Println("[INFO] All the system updates relaoded successfully")
 
 }

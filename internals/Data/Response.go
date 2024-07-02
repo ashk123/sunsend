@@ -10,7 +10,7 @@ import (
 
 type Response struct {
 	Res      string      `json:"RES"`
-	Channel  string      `json:"CHANNEL"`
+	Channel  string      `json:"CHANNEL,omitempty"`
 	Ebody    string      `json:"ERROR_BODY,omitempty"`
 	Messages interface{} `json:"DATA,omitempty"`
 	Image    string      `json:"IMAGE,omitempty"`
@@ -141,6 +141,12 @@ func GetResponseByResult(
 	case 27:
 		return GenerateNewError(
 			"There is not any imag file with that name",
+			http.StatusNotFound,
+			"FAILD",
+		)
+	case 30:
+		return GenerateNewError(
+			"Error when fetching channel list",
 			http.StatusNotFound,
 			"FAILD",
 		)
