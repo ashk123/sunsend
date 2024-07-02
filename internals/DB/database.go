@@ -40,7 +40,12 @@ func PrepairDBSystem() {
 	if _, err := os.Stat("Storage/SunSend.db"); os.IsNotExist(err) {
 		createDataBase()
 		createBaseTable()
-		InsertChannel(123, "Channel_1", "this is the default channel", "Eiko") // Create default chat Channel
+		InsertChannel(
+			123,
+			"Channel_1",
+			"this is the default channel",
+			"Eiko",
+		) // Create default chat Channel
 	} else {
 		// db = getbasedb()
 		log.Println("\nThere is a database.")

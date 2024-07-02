@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<style>
+		    .box {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background: whitesmoke;
+			padding: 10px;
+
+		    }
+		    .form {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background: whitesmoke;
+			padding: 10px;
+		    }
+		</style>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title></title>
+		<link href="css/style.css" rel="stylesheet">
+	</head>
+	<body>
+	    <div class="box">
+		Welcome to Sunsend Example client
+	    </div>
+
+	    <p id="information">asd</p>
+	    <p id="server">Response</p>
+	    <div class="box" id="inbox">
+	    </div>
+	    <div class"form">
+		<input type="text" id="id" name="id" placeholder="Enter your room ID ...">
+		<input type="msg" id="msg" name="msg" placeholder="Enter your room ID ...">
+		<button id="btn">Send</button>
+		<button id="rbtn">Refresh</button>
+	    
+	    </div>
+
+		<script src="lib.js"> </script>
+		<script>
+
+		    const serv = document.getElementById("server")
+		    const information = document.getElementById("information")
+
+		    var req = getChannelList()
+		    req.then((data) =>{
+			if (data.CODE == 200) {
+			    var asd = ""
+			    for (f = 0; f < data.DATA.length; f++) {
+				if (data.DATA[f].ID == 123) {
+				    console.log(data.DATA)
+				    asd += data.DATA[f].Name + " - " + data.DATA[f].Description
+				    break
+				}
+			    }
+			    information.innerHTML = asd
+			} else {
+			    information.innerHTML = "It's a time"
+			}
+		    })
+		    function Send() {
+			console.log("I'm trying to send a msg")
+			const user = document.getElementById("id").value // user
+			const msg = document.getElementById("msg").value // message
+
+			SendMsg(123, user, msg, 0).then((resp) => {
+			    if (resp.CODE == 200) {
+				serv.innerHTML = "you send the msg"
+			    }
+			})
+		    }
+		    var inbox = document.getElementById("inbox")
+		    var msgs = function() {
+			console.log("Trying to get msg from server")
+			GetMsgs(123, 0, 0).then((resp) => {
+			    if (resp.CODE == 200) {
+				console.log(resp)
+				var org = ""
+				for (i = 0; i < resp.DATA.length; i++) {
+				    org += resp.DATA[i].Author+": "+resp.DATA[i].Content+"<br>"
+				}
+				serv.innerHTML = org
+			    } else {
+				console.log("It's the wait time")
+			    }
+			})
+		    }
+		    //msgs()
+		    var btn = document.getElementById("btn")
+		    btn.addEventListener("click", Send, false)
+		    var rbtn = document.getElementById("rbtn")
+		    rbtn.addEventListener("click", msgs, false)
+		</script>
+
+	</body>
+</html>

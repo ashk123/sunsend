@@ -18,6 +18,12 @@ type Config struct {
 	Uconfig UserConfigConf    // usr `Config` folder configs
 }
 
+type Input struct {
+	Username string `json:"username",omitempty`
+	Message  string `json:"message",omitempty`
+	Reply    string `json:"reply",omitempty`
+}
+
 // Flags model for getMessageParameters
 type Flags struct {
 	SetRangeMessage []string

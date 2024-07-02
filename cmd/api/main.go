@@ -41,5 +41,9 @@ func main() {
 	Handlers.Handler(e)
 	DB.PrepairDBSystem()
 
-	e.Logger.Fatal(e.Start("127.0.0.1:" + temp.Get("config").(*Data.Config).Dotenv["PORT"]))
+	e.Logger.Fatal(
+		e.Start(
+			temp.Get("config").(*Data.Config).Dotenv["HOST"] + ":" + temp.Get("config").(*Data.Config).Dotenv["PORT"],
+		),
+	)
 }

@@ -142,7 +142,7 @@ func FindMsgByUsername(CID string, User string, flags *Data.Flags) (*Data.Messag
 	return msg_obj, 0
 }
 
-func FindMsgByChannelID(CID string, MID string, flags *Data.Flags) (*Data.Message, int) {
+func FindMsgByMsgID(CID string, MID string, flags *Data.Flags) (*Data.Message, int) {
 	message_rows := DB.QueryRow("SELECT * FROM Messages WHERE CID == " + CID + " AND MID == " + MID)
 	var user_cid, user_mid, user_ReplyID int
 	var user_Author, user_Content, user_Date string

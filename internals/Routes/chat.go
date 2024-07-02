@@ -18,8 +18,10 @@ import (
 
 func GetChatPostAction(c echo.Context) error {
 	channel_id_user := c.Param("id")
-	// flags := c.Request().Header
-	user := c.FormValue("user")
+	json_obj := ReadJSON(c)
+	user := json_obj.Username
+	msg := json_obj.Message
+	reply := json_obj.Reply
 	image_file_name := ""
 	image, err1 := c.FormFile("image")
 	if err1 == nil {
@@ -33,10 +35,17 @@ func GetChatPostAction(c echo.Context) error {
 		}
 		image_file_name = image.Filename
 	}
-	fmt.Println("A:LKSD:LAKSD:ALKSD:AKSD:A")
-	msg := c.FormValue("message") // get the message from userres_api_key
+	//fmt.Println("A:LKSD:LAKSD:ALKSD:AKSD:A")
+	//msg := c.FormValue("message") // get the message from userres_api_key
 	// fmt.Println("user", user, "wants to send a message to channel", channel_id_user, ":", msg)
-	log.Println("user", user, "wants to send a message to channel", channel_id_user, ":", msg)
+	log.Println(
+		"[INFO] User",
+		user,
+		"wants to send a message to channel",
+		channel_id_user,
+		":",
+		msg,
+	)
 	// headers := c.Request().Header
 	// apiKey, res_api_key := Base.BearerToken(headers)
 	// if res_api_key != 0 {
@@ -57,6 +66,7 @@ func GetChatPostAction(c echo.Context) error {
 	}
 	res_exists_channel := Base.ChannelExists(channel_id_user)
 	if res_exists_channel != 0 {
+
 		response_org, _ := Data.NewResponse(res_exists_channel, channel_id_user, nil, "")
 		return c.JSON(
 			response_org.Code,
@@ -66,15 +76,18 @@ func GetChatPostAction(c echo.Context) error {
 
 	// fmt.Println(msg)
 	IChannel_id_ser, _ := strconv.Atoi(channel_id_user)
+	Ireply, _ := strconv.Atoi(reply)
 	crt := time.Now()
+	// TODO: response msg base on date
 	res := DB.InsertMsg(
 		IChannel_id_ser,
 		rand.Intn(999),
 		user,
 		msg,
 		fmt.Sprintf("%d/%d/%d", crt.Year(), crt.Month(), crt.Day()),
+		//crt,
 		image,
-		0,
+		Ireply,
 	)
 	if res != 0 {
 		response, _ := Data.NewResponse(res, channel_id_user, nil, "")
@@ -88,7 +101,7 @@ func GetChatPostAction(c echo.Context) error {
 		}
 
 	}
-	response, _ := Data.NewResponse(0, channel_id_user, msg, image_file_name)
+	response, _ := Data.NewResponse(http.StatusOK, channel_id_user, msg, image_file_name)
 	return c.JSON(response.Code, response)
 
 }
@@ -97,6 +110,15 @@ func StreamResponseJSON(c echo.Context, chat_data *Data.Response) error {
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
 	c.Response().WriteHeader(http.StatusOK)
 	return json.NewEncoder(c.Response()).Encode(chat_data)
+}
+
+func ReadJSON(c echo.Context) Data.Input {
+	msg := Data.Input{}
+	err := json.NewDecoder(c.Request().Body).Decode(&msg)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	return msg
 }
 
 // This is the Get Function Runner
@@ -131,7 +153,7 @@ func chatActionFunc(c echo.Context) error {
 	// If user just wants to find a message
 	if find_id != "" {
 		// if the data is digit
-		chat_collection, res := Base.FindMsgByChannelID(channel_id, find_id, nil)
+		chat_collection, res := Base.FindMsgByMsgID(channel_id, find_id, nil)
 		if res != 0 {
 			response, _ = Data.NewResponse(res, channel_id, nil, "")
 			return c.JSON(response.Code, response)
