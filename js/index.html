@@ -35,7 +35,8 @@
 	    <div class"form">
 
 		<input type="text" id="id" name="id" placeholder="Enter your Nickname ...">
-		<input type="msg" id="msg" name="msg" placeholder="Enter your room ID ...">
+		<input type="text" id="msg" name="msg" placeholder="Enter your msg ...">
+		<input type="file" id="file" name="msg">
 		<button id="btn">Send</button>
 		<button id="rbtn">Refresh</button>
 		<br/>
@@ -73,8 +74,9 @@
 			console.log("I'm trying to send a msg")
 			const user = document.getElementById("id").value // user
 			const msg = document.getElementById("msg").value // message
+			const file = document.getElementById("file") // file
 
-			SendMsg(123, user, msg, 0).then((resp) => {
+			SendMsg(123, user, msg, 0, file).then((resp) => {
 			    if (resp.CODE == 200) {
 				serv.innerHTML = "you send the msg"
 			    }
@@ -83,7 +85,7 @@
 		    var inbox = document.getElementById("inbox")
 		    var msgs = function() {
 			console.log("Trying to get msg from server")
-			GetMsgs(123, 0, 0).then((resp) => {
+			GetMsgs(123, "3-1").then((resp) => {
 			    if (resp.CODE == 200) {
 				console.log(resp)
 				var org = ""

@@ -2,7 +2,6 @@ package Routes
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"sunsend/internals/Base"
 	"sunsend/internals/Data"
@@ -13,7 +12,7 @@ import (
 func media_route_action(c echo.Context) error {
 	media_file_name := c.Param("file_name")
 	// TODO: Check for SqlInjection things
-	log.Println("File name is", media_file_name+".zst")
+	//log.Println("File name is", media_file_name+".zst")
 	if Base.IsFileExists("Storage/"+media_file_name+".zst") == false {
 		response, _ := Data.NewResponse(27, "", nil, "")
 		return c.JSON(response.Code, response)

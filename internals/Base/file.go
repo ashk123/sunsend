@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	FILE_SIZE int64 = (1024 ^ 2) * 5 // 5MB Of data
+	FILE_SIZE int64 = (1024 ^ 2) * 30 // 30MB Of data
 )
 
 func DecompressFile(filename string) ([]byte, int) {
@@ -66,7 +66,7 @@ func SaveImageFile(image *multipart.FileHeader) error {
 }
 
 func HandleFiles(file *multipart.FileHeader) int {
-	if len(file.Filename) > 10 {
+	if len(file.Filename) > 50 {
 		return 23
 	}
 	switch value := file.Filename; {

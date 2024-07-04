@@ -39,7 +39,7 @@ func Itsr(data int) string {
 func ReadJSONMsg(c echo.Context) (Data.InputMsg, int) {
 	msg := Data.InputMsg{}
 	err := json.NewDecoder(c.Request().Body).Decode(&msg)
-	log.Println(msg)
+	//log.Println(msg)
 	if err != nil {
 		log.Println("[ERROR] Can't Parse the JSON Message Input (Message) cause " + err.Error())
 		return Data.InputMsg{}, 31
@@ -93,6 +93,20 @@ func ReadJSONChan(c echo.Context) (Data.InputChan, int) {
 
 // }
 
+func DeleteMsgsByID(cid string, msg_id string) int {
+	_, rese := FindMsgByMsgID(cid, msg_id, nil)
+	if rese != 0 {
+		return rese
+	}
+	res := DB.QueryRow(fmt.Sprintf("DELETE FROM Messages WHERE MID = %s", msg_id))
+	err := res.Scan()
+	if err != nil && errors.Is(err, sql.ErrNoRows) == false {
+		log.Println(err.Error())
+		return 33
+	}
+	return 0
+}
+
 func Unmarshal(Rows *sql.Rows) ([]Data.Message, error) {
 	data := []Data.Message{}
 	defer Rows.Close()
@@ -115,7 +129,6 @@ func Unmarshal(Rows *sql.Rows) ([]Data.Message, error) {
 			&user_ReplyID,
 		)
 		if err != nil {
-			log.Println(err.Error())
 			return nil, errors.New("ERROR: can't Read from database cause: " + err.Error())
 		}
 		if user_Image != "None" {
@@ -134,14 +147,13 @@ func Unmarshal(Rows *sql.Rows) ([]Data.Message, error) {
 	}
 	return data, nil
 }
-func FindMsgByUsername(CID string, User string, flags *Data.Flags) (*Data.Message, int) {
-	message_rows := DB.QueryRow(
-		"SELECT * FROM Messages WHERE CID == " + CID + " AND Author == " + User,
-	)
+
+func UnmarshalRow(Row *sql.Row) (*Data.Message, error) {
+
 	var user_cid, user_mid, user_ReplyID int
 	var user_Author, user_Content, user_Date string
 	var user_image string
-	err := message_rows.Scan(
+	err := Row.Scan(
 		&user_cid,
 		&user_mid,
 		&user_Author,
@@ -151,8 +163,7 @@ func FindMsgByUsername(CID string, User string, flags *Data.Flags) (*Data.Messag
 		&user_ReplyID,
 	)
 	if err != nil {
-		log.Println(err.Error())
-		return nil, 19
+		return nil, errors.New("ERROR: Can't read message from Database cause: " + err.Error())
 	}
 	msg_obj := &Data.Message{
 		CID:     user_cid,
@@ -162,35 +173,28 @@ func FindMsgByUsername(CID string, User string, flags *Data.Flags) (*Data.Messag
 		Date:    user_Date,
 		Image:   user_image,
 		ReplyID: user_ReplyID,
+	}
+	return msg_obj, nil
+}
+
+func FindMsgByUsername(CID string, User string, flags *Data.Flags) (*Data.Message, int) {
+	message_rows := DB.QueryRow(
+		"SELECT * FROM Messages WHERE CID == " + CID + " AND Author == " + User,
+	)
+	msg_obj, err := UnmarshalRow(message_rows)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, 31
 	}
 	return msg_obj, 0
 }
 
 func FindMsgByMsgID(CID string, MID string, flags *Data.Flags) (*Data.Message, int) {
 	message_rows := DB.QueryRow("SELECT * FROM Messages WHERE CID == " + CID + " AND MID == " + MID)
-	var user_cid, user_mid, user_ReplyID int
-	var user_Author, user_Content, user_Date string
-	var user_image string
-	err := message_rows.Scan(
-		&user_cid,
-		&user_mid,
-		&user_Author,
-		&user_Content,
-		&user_Date,
-		&user_image,
-		&user_ReplyID,
-	)
+	msg_obj, err := UnmarshalRow(message_rows)
 	if err != nil {
-		return nil, 19
-	}
-	msg_obj := &Data.Message{
-		CID:     user_cid,
-		MID:     user_mid,
-		Author:  user_Author,
-		Content: user_Content,
-		Image:   user_image,
-		Date:    user_Date,
-		ReplyID: user_ReplyID,
+		log.Println(err.Error())
+		return nil, 31
 	}
 	return msg_obj, 0
 }

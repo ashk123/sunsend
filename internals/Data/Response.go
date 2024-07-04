@@ -156,6 +156,13 @@ func GetResponseByResult(
 			400,
 			"FAILD",
 		)
+
+	case 33:
+		return GenerateNewError(
+			"Faild to delete the message",
+			http.StatusNotAcceptable,
+			"FAILD",
+		)
 	default:
 		return GenerateNewError(
 			"",

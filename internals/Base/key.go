@@ -3,7 +3,6 @@ package Base
 import (
 	"crypto/sha256"
 	"crypto/subtle"
-	"fmt"
 	"strings"
 	"sunsend/internals/Data"
 )
@@ -16,7 +15,7 @@ func GenerateAPIKey(rawkey string) [32]byte {
 }
 
 func BearerToken(headers map[string][]string) (string, int) {
-	fmt.Println(headers)
+	//fmt.Println(headers)
 	api_key_org, ok := headers["Api_key"]
 	if !ok {
 		return "", 17 // invalid API KE	Y

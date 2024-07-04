@@ -18,17 +18,20 @@ import (
 
 func GetChatPostAction(c echo.Context) error {
 	channel_id_user := c.Param("id")
-	json_obj, res1 := Base.ReadJSONMsg(c) // Read the JSON input from user
-	if res1 != 0 {
-		response_file, _ := Data.NewResponse(res1, channel_id_user, nil, "")
-		return c.JSON(
-			response_file.Code,
-			response_file,
-		)
-	}
-	user := json_obj.Username
-	msg := json_obj.Message
-	reply := json_obj.Reply
+	//json_obj, res1 := Base.ReadJSONMsg(c) // Read the JSON input from user
+	//if res1 != 0 {
+	//	response_file, _ := Data.NewResponse(res1, channel_id_user, nil, "")
+	//	return c.JSON(
+	//		response_file.Code,
+	//		response_file,
+	//	)
+	//}
+	//user := json_obj.Username
+	//msg := json_obj.Message
+	//reply := json_obj.Reply
+	user := c.FormValue("username")
+	msg := c.FormValue("message")
+	reply := c.FormValue("reply")
 	image_file_name := ""
 	image, err1 := c.FormFile("image")
 	if err1 == nil {
@@ -41,6 +44,8 @@ func GetChatPostAction(c echo.Context) error {
 			)
 		}
 		image_file_name = image.Filename
+	} else {
+		log.Fatal(err1.Error())
 	}
 	//fmt.Println("A:LKSD:LAKSD:ALKSD:AKSD:A")
 	//msg := c.FormValue("message") // get the message from userres_api_key
@@ -83,6 +88,7 @@ func GetChatPostAction(c echo.Context) error {
 
 	// fmt.Println(msg)
 	IChannel_id_ser, _ := strconv.Atoi(channel_id_user)
+	Ireply, _ := strconv.Atoi(reply)
 	crt := time.Now()
 	// TODO: response msg base on date
 	res := DB.InsertMsg(
@@ -93,7 +99,7 @@ func GetChatPostAction(c echo.Context) error {
 		fmt.Sprintf("%d/%d/%d", crt.Year(), crt.Month(), crt.Day()),
 		//crt,
 		image,
-		reply,
+		Ireply,
 	)
 	if res != 0 {
 		response, _ := Data.NewResponse(res, channel_id_user, nil, "")
@@ -125,6 +131,7 @@ func chatActionFunc(c echo.Context) error {
 	flags := &Data.Flags{SetRangeMessage: []string{}} // initial of flags
 	channel_id := c.Param("id")
 	find_id := c.QueryParam("find")
+	del_id := c.QueryParam("remove")
 	user_name_search := c.QueryParam("username")
 	var chat_collection []Data.Message
 	get_message_range := c.QueryParam("range")
@@ -135,7 +142,14 @@ func chatActionFunc(c echo.Context) error {
 		response, _ = Data.NewResponse(res_exists_channel, channel_id, nil, "")
 		return c.JSON(response.Code, response)
 	}
-
+	// Otherwise user wants to have the group of messages from a channel
+	// fmt.Println(res_exists_channel)
+	if get_message_range != "" { // If user wants to have specific amount of data
+		log.Println("I'M UISING THJIS PROGRAM FOR THIS CHT KAHAHAHAHAHAH")
+		data_spl := strings.Split(get_message_range, "-")
+		flags.SetRangeMessage = data_spl
+		// fmt.Println(flags.SetRangeMessage)
+	}
 	if user_name_search != "" {
 		//log.Printf("a%sa", user_name_search)
 		chat_collection_by_user, res := Base.FindMsgsByUsername(channel_id, user_name_search, flags)
@@ -144,6 +158,22 @@ func chatActionFunc(c echo.Context) error {
 			return c.JSON(response.Code, response)
 		}
 		response, _ = Data.NewResponse(res, channel_id, chat_collection_by_user, "")
+		return c.JSON(http.StatusOK, response)
+	}
+
+	if del_id != "" {
+		//log.Printf("a%sa", user_name_search)
+		res := Base.DeleteMsgsByID(channel_id, del_id)
+		if res != 0 {
+			response, _ = Data.NewResponse(res, channel_id, nil, "")
+			return c.JSON(response.Code, response)
+		}
+		response, _ = Data.NewResponse(
+			res,
+			channel_id,
+			fmt.Sprintf("%s succsessfully removed", del_id),
+			"",
+		)
 		return c.JSON(http.StatusOK, response)
 	}
 
@@ -157,14 +187,6 @@ func chatActionFunc(c echo.Context) error {
 		}
 		response, _ = Data.NewResponse(res, channel_id, chat_collection, "")
 		return c.JSON(response.Code, response)
-	}
-
-	// Otherwise user wants to have the group of messages from a channel
-	// fmt.Println(res_exists_channel)
-	if get_message_range != "" { // If user wants to have specific amount of data
-		data_spl := strings.Split(get_message_range, "-")
-		flags.SetRangeMessage = data_spl
-		// fmt.Println(flags.SetRangeMessage)
 	}
 
 	chat_collection, res := Base.FindMsgsByChannelID(channel_id, flags)
